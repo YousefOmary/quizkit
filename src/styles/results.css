@@ -8,6 +8,19 @@
 .result-stats { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; padding: 13px 0; border-block: 1px solid var(--border); }
 .result-stats > div { display: flex; flex-direction: column; border-right: 1px solid var(--border); }
 .result-stats > div:last-child { border: 0; }.result-stats strong { font-size: .98rem; }.result-stats span { color: var(--muted); font-size: .64rem; }
+.reward-rows { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+.reward-row {
+  display: flex; align-items: center; gap: 9px; padding: 8px 12px;
+  border: 1px solid var(--border); border-radius: 12px; background: var(--surface);
+  font-size: .72rem; text-align: left;
+}
+.reward-row b { flex: 0 0 auto; font-weight: 850; }
+.reward-row span { color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reward-row.xp b { color: var(--category); }
+.reward-row.level-up { border-color: var(--category); animation: reward-pop .5s cubic-bezier(.2,1.3,.3,1) both; }
+.reward-row.mission b, .reward-row.achievement b { font-size: .72rem; }
+.reward-row.achievement { border-color: var(--correct); }
+
 .daily-lock { margin: 2px 0; color: var(--muted); font-size: .7rem; }
 .results .primary-action { margin-top: 5px; }
 .toast { position: fixed; z-index: 60; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); left: 50%; transform: translateX(-50%); padding: 11px 16px; border-radius: 99px; background: var(--text); color: var(--bg); font-size: .72rem; font-weight: 800; box-shadow: var(--shadow); }

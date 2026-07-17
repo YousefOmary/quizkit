@@ -32,7 +32,9 @@ export function consumeLifeline(
     return { kind };
   }
   const presented = engine.current();
-  if (!presented || presented.kind !== 'choice') return null;
+  // 50:50 needs >2 options: on a two-option question it would remove the
+  // only wrong answer and hand the player a guaranteed win.
+  if (!presented || presented.kind !== 'choice' || presented.options.length <= 2) return null;
   const mode = getMode(session.modeId);
   const question = session.quiz.questions[session.quiz.index];
   const wrong = presented.options.map((_, index) => index)

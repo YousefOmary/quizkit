@@ -5,7 +5,8 @@ import { h } from './dom.js';
 /** Close function returned by every modal sheet. */
 export type CloseSheet = () => void;
 
-function sheet(title: string, content: Node[], onDismiss: () => void): CloseSheet {
+/** Build and open a modal bottom sheet. Shared by every dialog. */
+export function showSheet(title: string, content: Node[], onDismiss: () => void): CloseSheet {
   const close = (): void => {
     document.removeEventListener('keydown', onKey);
     overlay.remove();
@@ -37,7 +38,7 @@ export function showHowTo(onDismiss: () => void): CloseSheet {
     ['3', 'Use one-shot assists', '50:50, Skip, and +10 seconds each work once per quiz.'],
     ['4', 'Build a combo', 'Fast correct answers score more; streaks raise the multiplier.'],
   ];
-  return sheet('How to play', [
+  return showSheet('How to play', [
     h('p', { className: 'sheet-intro', text: 'Five questions. One quick trip around the world.' }),
     h('div', { className: 'how-list' }, steps.map(([number, title, copy]) => h('div', { className: 'how-step' }, [
       h('b', { text: number }), h('div', {}, [h('strong', { text: title }), h('p', { text: copy })]),
@@ -47,40 +48,42 @@ export function showHowTo(onDismiss: () => void): CloseSheet {
   function close(): void { document.querySelector<HTMLElement>('.sheet-overlay')?.click(); }
 }
 
-/** Persisted theme, audio, and timer settings. */
+/** Persisted theme, audio, haptic, and timer settings. */
 export function showSettings(
   settings: Settings,
-  onChange: (next: Settings) => void,
+  onChange: (next: Settings, key: string) => void,
   onDismiss: () => void,
 ): CloseSheet {
   const local = { ...settings };
   const rows: HTMLElement[] = [];
-  const addToggle = (label: string, copy: string, key: 'sound' | 'music' | 'timer'): void => {
+  const addToggle = (label: string, copy: string, key: 'sound' | 'music' | 'haptics' | 'timer'): void => {
     const button = h('button', { className: 'toggle', attrs: { type: 'button', role: 'switch' } });
     const update = (): void => {
       button.textContent = local[key] ? 'On' : 'Off';
       button.setAttribute('aria-checked', String(local[key]));
       button.classList.toggle('on', local[key]);
     };
-    button.addEventListener('click', () => { local[key] = !local[key]; update(); onChange({ ...local }); });
+    button.addEventListener('click', () => { local[key] = !local[key]; update(); onChange({ ...local }, key); });
     update();
     rows.push(settingRow(label, copy, button));
   };
-  const theme = h('div', { className: 'segmented' }, (['light', 'dark'] as const).map((value) => h('button', {
+  const THEME_LABELS = { light: '☀ Light', dark: '◐ Dark', system: 'Auto' } as const;
+  const theme = h('div', { className: 'segmented' }, (['light', 'dark', 'system'] as const).map((value) => h('button', {
     className: local.theme === value ? 'selected' : '',
-    text: value === 'light' ? '☀ Light' : '◐ Dark',
+    text: THEME_LABELS[value],
     onClick: (event) => {
       local.theme = value;
       (event.currentTarget as HTMLElement).parentElement?.querySelectorAll('button').forEach((button) => button.classList.toggle('selected', button === event.currentTarget));
-      onChange({ ...local });
+      onChange({ ...local }, 'theme');
     },
     attrs: { type: 'button' },
   })));
-  rows.push(settingRow('Appearance', 'High-contrast light or dark theme.', theme));
+  rows.push(settingRow('Appearance', 'Light, dark, or follow the device.', theme));
   addToggle('Sound effects', 'Procedural taps, reveals, and fanfare.', 'sound');
   addToggle('Ambient music', 'A very quiet focus tone.', 'music');
-  addToggle('Question timer', '15 seconds plus a speed bonus.', 'timer');
-  return sheet('Settings', [
+  addToggle('Vibration', 'Tiny pulses on answers, where supported.', 'haptics');
+  addToggle('Practice timer', '15s + speed bonus. The Daily is always timed so scores stay fair.', 'timer');
+  return showSheet('Settings', [
     h('div', { className: 'settings-list' }, rows),
     h('p', { className: 'source-note', text: SOURCE_NOTE }),
   ], onDismiss);
@@ -89,7 +92,7 @@ export function showSettings(
 /** Confirm replacing an unfinished practice round. */
 export function showNewQuizConfirm(onConfirm: () => void, onDismiss: () => void): CloseSheet {
   let close = (): void => undefined;
-  close = sheet('Start a new quiz?', [
+  close = showSheet('Start a new quiz?', [
     h('p', { className: 'sheet-intro', text: 'This will replace the unfinished practice route for your current region and mode.' }),
     h('button', { className: 'primary-action danger', text: 'Start new quiz', onClick: () => { close(); onConfirm(); }, attrs: { type: 'button' } }),
     h('button', { className: 'secondary-action', text: 'Keep current quiz', onClick: () => close(), attrs: { type: 'button' } }),
@@ -101,7 +104,7 @@ export function showNewQuizConfirm(onConfirm: () => void, onDismiss: () => void)
 export function showPause(onResume: () => void, onExit: () => void): CloseSheet {
   let close = (): void => undefined;
   let handled = false;
-  close = sheet('Quiz paused', [
+  close = showSheet('Quiz paused', [
     h('p', { className: 'sheet-intro', text: 'The timer is stopped and your exact place is saved.' }),
     h('button', { className: 'primary-action', text: 'Resume', onClick: () => { handled = true; close(); onResume(); }, attrs: { type: 'button' } }),
     h('button', { className: 'secondary-action', text: 'Save & exit', onClick: () => { handled = true; close(); onExit(); }, attrs: { type: 'button' } }),

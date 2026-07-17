@@ -2,6 +2,8 @@ import { audio } from '../audio/audioCore.js';
 import { QuizEngine } from '../engine/engine.js';
 import type { AnswerInput, Judgement } from '../engine/types.js';
 import { getMode } from '../modes/index.js';
+import { analytics, responseBucket } from '../platform/analytics.js';
+import { haptics } from '../platform/haptics.js';
 import type { ProductStore } from '../platform/productStore.js';
 import { getCategory } from '../product/countries.js';
 import { MODE_INFO, TIMINGS } from '../product/config.js';
@@ -96,16 +98,29 @@ export class PlaySession {
     if (this.awaiting || this.paused || this.engine.isFinished()) return;
     void audio.unlock();
     audio.tap();
+    haptics.press();
     this.awaiting = true;
     const timeLeft = this.timer.pause();
     const judgement = this.engine.answer(input, timeLeft);
     const record = this.session.quiz.answers.at(-1)!;
     this.session.timerLeft = 0;
     this.reveal(input, judgement, record.points, record.multiplier ?? 1);
+    analytics.track({
+      name: 'answer_judged',
+      correct: judgement.correct,
+      bucket: responseBucket(timeLeft, this.session.quiz.timerSeconds),
+    });
     if (judgement.correct) {
       audio.correct(this.session.quiz.streakInQuiz);
-      if ([3, 5].includes(this.session.quiz.streakInQuiz)) audio.milestone();
-    } else audio.wrong();
+      haptics.correct();
+      if ([3, 5].includes(this.session.quiz.streakInQuiz)) {
+        audio.milestone();
+        haptics.milestone();
+      }
+    } else {
+      audio.wrong();
+      haptics.wrong();
+    }
     void this.store.saveSession(this.session);
     this.scheduleAdvance(TIMINGS.reveal);
   }
@@ -117,6 +132,8 @@ export class PlaySession {
     void audio.unlock();
     const outcome = consumeLifeline(kind, this.session, this.engine, this.timer);
     if (!outcome) return;
+    analytics.track({ name: 'lifeline_used', lifeline: kind });
+    haptics.press();
     this.view?.updateLifelines(this.session.lifelines);
     if (outcome.eliminated) this.view?.eliminate(outcome.eliminated);
     if (outcome.judgement) {
@@ -139,6 +156,7 @@ export class PlaySession {
   }
   private finish(): void {
     audio.complete();
+    haptics.milestone();
     this.dispose();
     this.actions.onFinish(this.session);
   }

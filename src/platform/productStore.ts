@@ -1,6 +1,7 @@
 import type { StorageAdapter } from './StorageAdapter.js';
 import { PRODUCT_ID } from '../product/config.js';
 import { defaultDailyMeta, defaultSettings } from '../product/defaults.js';
+import { defaultProgress, type ProgressState } from '../product/progress.js';
 import type { DailyMeta, GameSession, Settings, StatsBook } from '../product/types.js';
 
 /** Additive, guarded persistence for Atlas Sprint product data. */
@@ -53,6 +54,24 @@ export class ProductStore {
   /** Persist the cross-day streak. */
   saveDailyMeta(meta: DailyMeta): Promise<void> {
     return this.write('daily-meta', meta);
+  }
+
+  /** Load XP, achievements, and daily-goal progress with additive defaults. */
+  async loadProgress(): Promise<ProgressState> {
+    const loaded = await this.read('progress', defaultProgress());
+    // Nested objects need their own additive merge — a partial old record
+    // must never drop counter keys added by later versions.
+    return {
+      ...loaded,
+      counters: { ...defaultProgress().counters, ...loaded.counters },
+      achievements: loaded.achievements ?? {},
+      missionProgress: Array.isArray(loaded.missionProgress) ? loaded.missionProgress : [],
+    };
+  }
+
+  /** Persist progression. */
+  saveProgress(progress: ProgressState): Promise<void> {
+    return this.write('progress', progress);
   }
 
   /** Load a round by its explicit key. */

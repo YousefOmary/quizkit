@@ -62,6 +62,7 @@ export function createKeyboard(onSubmit: (value: string) => void): KeyboardHandl
   }, rows)]);
 
   const onKey = (event: KeyboardEvent): void => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
     if (/^[a-z]$/i.test(event.key)) press(event.key.toUpperCase());
     else if (event.key === 'Backspace') press('⌫');
     else if (event.key === ' ') press('SPACE');

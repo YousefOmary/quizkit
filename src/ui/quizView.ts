@@ -68,9 +68,9 @@ export function renderQuizView(root: HTMLElement, ctx: QuizViewCtx): QuizViewHan
     lifelineButton('skip', 'Skip', ctx.onLifeline),
     lifelineButton('time', '+10 sec', ctx.onLifeline),
   ];
-  if (ctx.presented.kind === 'text') {
+  if (ctx.presented.kind === 'text' || ctx.presented.options.length <= 2) {
     lifelines[0]!.disabled = true;
-    lifelines[0]!.setAttribute('aria-label', '50:50 — choice modes only');
+    lifelines[0]!.setAttribute('aria-label', '50:50 — needs four choices');
   }
   if (!ctx.timerTotal) lifelines[2]!.disabled = true;
   const screen = h('main', { className: 'screen quiz screen-enter' }, [

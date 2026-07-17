@@ -21,6 +21,8 @@ export interface HlPack {
   prompt: string;
   /** Optional unit appended to revealed values, e.g. 'people'. */
   unit?: string;
+  /** Optional pack-supplied context shown after every reveal. */
+  explanation?: string;
   questions: HlPackQuestion[];
 }
 
@@ -28,6 +30,7 @@ export interface HlPack {
 interface HlRuntime {
   prompt: string;
   unit: string;
+  explanation?: string;
   items: [HlItem, HlItem];
 }
 
@@ -45,6 +48,7 @@ function buildQuiz(pack: unknown, rng: Rng, count: number): unknown[] {
       return {
         prompt: p.prompt,
         unit: p.unit ?? '',
+        explanation: p.explanation,
         items: flip ? [q.b, q.a] : [q.a, q.b],
       };
     });
@@ -74,7 +78,7 @@ function judge(question: unknown, input: AnswerInput): Judgement {
     correct: input === correctIndex,
     correctAnswer: reveal,
     correctIndex,
-    explanation: 'Compared by total area, including inland water.',
+    explanation: q.explanation,
   };
 }
 

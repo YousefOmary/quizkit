@@ -75,6 +75,7 @@ function higherLower(category: Category): HlPack {
     packId: `${category.id}-area-hl-v1`,
     prompt: 'Which country has the larger total area?',
     unit: 'km²',
+    explanation: 'Compared by total area, including inland water.',
     questions: pairs(category.facts),
   };
 }

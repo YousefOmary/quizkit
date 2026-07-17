@@ -2,11 +2,11 @@ import type { DailyMeta, ModeStats, Settings } from './types.js';
 
 /** Fresh preferences; future versions add keys without removing old ones. */
 export function defaultSettings(): Settings {
-  const dark = typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches;
   return {
-    theme: dark ? 'dark' : 'light',
+    theme: 'system',
     sound: true,
     music: false,
+    haptics: true,
     timer: true,
     onboardingSeen: false,
     categoryId: 'americas',

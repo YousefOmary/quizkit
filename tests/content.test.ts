@@ -15,6 +15,25 @@ test('content: 24 unique, complete country records', () => {
   }
 });
 
+test('content: higher-lower pairs can never tie', () => {
+  for (const category of CATEGORIES) {
+    const areas = category.facts.map((fact) => fact.area);
+    assert.equal(new Set(areas).size, areas.length, `${category.id} areas are all distinct`);
+  }
+});
+
+test('content: type-answer aliases never duplicate another country’s capital', () => {
+  const capitals = new Set(CATEGORIES.flatMap((c) => c.facts.map((f) => f.capital.toLowerCase())));
+  for (const category of CATEGORIES) {
+    for (const fact of category.facts) {
+      for (const alias of fact.accepted ?? []) {
+        const clash = [...capitals].filter((name) => name === alias.toLowerCase() && name !== fact.capital.toLowerCase());
+        assert.deepEqual(clash, [], `alias '${alias}' is unambiguous`);
+      }
+    }
+  }
+});
+
 test('content: generated choice packs have one answer and three unique distractors', () => {
   for (const category of CATEGORIES) {
     const pack = getPack(category, 'multiple-choice') as McPack;

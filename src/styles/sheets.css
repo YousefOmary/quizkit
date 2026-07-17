@@ -31,3 +31,24 @@
 .segmented button { min-height: 32px; padding: 5px 8px; border: 0; border-radius: 9px; background: transparent; font-size: .66rem; }
 .segmented .selected { background: var(--surface); box-shadow: var(--shadow); }
 .source-note { margin: 16px 0 0; color: var(--muted); font-size: .65rem; line-height: 1.4; }
+
+.stats-section { margin-top: 14px; padding: 12px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.stats-section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.stats-section-head h3 { margin: 0; font-size: .86rem; }
+.mastery-chip { padding: 4px 9px; border-radius: 99px; background: var(--surface-2); color: var(--text); font-size: .62rem; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
+.stats-row { display: grid; grid-template-columns: 1fr 52px 48px 56px; gap: 6px; padding: 6px 0; font-size: .72rem; font-variant-numeric: tabular-nums; }
+.stats-row > span { text-align: right; }
+.stats-row-mode { text-align: left !important; font-weight: 700; }
+.stats-head { color: var(--muted); font-size: .62rem; border-bottom: 1px solid var(--border); }
+
+.award-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.award-row {
+  display: grid; grid-template-columns: 40px 1fr 22px; gap: 10px; align-items: center;
+  padding: 11px 12px; border: 1px solid var(--border); border-radius: 15px;
+  background: var(--surface); opacity: .55;
+}
+.award-row.earned { opacity: 1; border-color: var(--correct); }
+.award-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--surface-2); font-size: 1.1rem; }
+.award-copy strong { font-size: .78rem; }
+.award-copy p { margin: 2px 0 0; color: var(--muted); font-size: .66rem; line-height: 1.35; }
+.award-state { color: var(--correct); font-weight: 900; text-align: center; }

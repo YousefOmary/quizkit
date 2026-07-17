@@ -31,7 +31,9 @@ export function createSession(
   const seed = kind === 'daily'
     ? dailySeed(dateKey, pack.packId)
     : (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0;
-  const timerSeconds = settings.timer ? TIMER_SECONDS : 0;
+  // The Daily uses fixed rules for everyone — the timer preference only
+  // relaxes practice rounds, so canonical daily scores stay comparable.
+  const timerSeconds = kind === 'daily' || settings.timer ? TIMER_SECONDS : 0;
   const key = sessionKey(kind, category.id, modeId, dateKey);
   return {
     version: 1,

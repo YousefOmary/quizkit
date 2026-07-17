@@ -23,9 +23,12 @@ export interface Category {
 
 /** Persistent player preferences. */
 export interface Settings {
-  theme: 'light' | 'dark';
+  /** 'system' follows the device; saved 'light'/'dark' values stay valid. */
+  theme: 'light' | 'dark' | 'system';
   sound: boolean;
   music: boolean;
+  haptics: boolean;
+  /** Practice-round timer. The Daily is always timed for fair scores. */
   timer: boolean;
   onboardingSeen: boolean;
   categoryId: CategoryId;

@@ -1,6 +1,9 @@
 import { MODE_INFO, PRODUCT_NAME, TIMINGS } from '../product/config.js';
+import { MISSION_XP } from '../product/progress.js';
+import type { RoundReward } from '../product/recordResult.js';
 import type { DailyMeta, GameSession, ModeStats } from '../product/types.js';
 import { clearChildren, h } from './dom.js';
+import type { ShareOutcome } from './share.js';
 
 /** Completed-round presentation and actions. */
 export interface ResultsCtx {
@@ -8,7 +11,9 @@ export interface ResultsCtx {
   category: string;
   stats: ModeStats;
   dailyMeta: DailyMeta;
-  onShare: () => Promise<boolean>;
+  /** What this round just earned; null when reviewing an old result. */
+  reward: RoundReward | null;
+  onShare: () => Promise<ShareOutcome>;
   onAgain: () => void;
   onMenu: () => void;
 }
@@ -20,9 +25,16 @@ export function renderResultsView(root: HTMLElement, ctx: ResultsCtx): void {
   const gridText = state.answers.map((answer) => answer.correct ? '🟩' : '🟥').join('');
   const score = h('strong', { className: 'result-score', text: '0' });
   const share = h('button', { className: 'primary-action', text: 'Share result', attrs: { type: 'button' } });
-  const toast = h('div', { className: 'toast', text: 'Copied to clipboard', attrs: { role: 'status', hidden: '' } });
-  share.addEventListener('click', () => void ctx.onShare().then((ok) => {
-    toast.textContent = ok ? 'Copied to clipboard' : 'Couldn’t copy — try again';
+  const toast = h('div', { className: 'toast', text: '', attrs: { role: 'status', hidden: '' } });
+  const TOAST_COPY: Partial<Record<ShareOutcome, string>> = {
+    shared: 'Shared!',
+    copied: 'Copied to clipboard',
+    failed: 'Couldn’t share — try again',
+  };
+  share.addEventListener('click', () => void ctx.onShare().then((outcome) => {
+    const copy = TOAST_COPY[outcome];
+    if (!copy) return;
+    toast.textContent = copy;
     toast.removeAttribute('hidden');
     setTimeout(() => toast.setAttribute('hidden', ''), TIMINGS.toast);
   }));
@@ -37,6 +49,7 @@ export function renderResultsView(root: HTMLElement, ctx: ResultsCtx): void {
     score,
     h('span', { className: 'score-caption', text: 'TOTAL POINTS' }),
     h('div', { className: 'share-grid', text: gridText, attrs: { 'aria-label': `${correct} correct out of ${state.answers.length}` } }),
+    ...(ctx.reward ? [rewardRows(ctx.reward)] : []),
     h('div', { className: 'result-stats' }, [
       resultStat('Best', ctx.stats.bestScore.toLocaleString()),
       resultStat('Accuracy', `${ctx.stats.answered ? Math.round(ctx.stats.correct / ctx.stats.answered * 100) : 0}%`),
@@ -52,6 +65,35 @@ export function renderResultsView(root: HTMLElement, ctx: ResultsCtx): void {
   root.appendChild(screen);
   countUp(score, state.score);
   confetti(screen);
+}
+
+/** The XP, level-up, goal, and achievement lines one round earned. */
+function rewardRows(reward: RoundReward): HTMLElement {
+  const rows: HTMLElement[] = [
+    h('div', { className: 'reward-row xp' }, [
+      h('b', { text: `+${reward.xpGained} XP` }),
+      h('span', { text: `Level ${reward.level.level} ${reward.title} · ${reward.level.into}/${reward.level.need} to next` }),
+    ]),
+  ];
+  if (reward.level.level > reward.levelBefore) {
+    rows.push(h('div', { className: 'reward-row level-up' }, [
+      h('b', { text: '⬆ Level up!' }),
+      h('span', { text: `You’re now a Level ${reward.level.level} ${reward.title}` }),
+    ]));
+  }
+  for (const mission of reward.missionsCompleted) {
+    rows.push(h('div', { className: 'reward-row mission' }, [
+      h('b', { text: '🎯 Goal done' }),
+      h('span', { text: `${mission.label} · +${MISSION_XP} XP` }),
+    ]));
+  }
+  for (const achievement of reward.achievementsUnlocked) {
+    rows.push(h('div', { className: 'reward-row achievement' }, [
+      h('b', { text: `${achievement.icon} Unlocked` }),
+      h('span', { text: achievement.name }),
+    ]));
+  }
+  return h('div', { className: 'reward-rows', attrs: { 'aria-label': 'Progress earned' } }, rows);
 }
 
 function resultStat(label: string, value: string): HTMLElement {
