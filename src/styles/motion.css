@@ -1,0 +1,15 @@
+.screen-enter { animation: screen-in .3s cubic-bezier(.2,.8,.2,1) both; }
+.flash-good { animation: good-flash .48s ease; }
+.flash-bad { animation: bad-flash .48s ease; }
+.combo-pop { animation: combo-pop .7s cubic-bezier(.2,1.4,.3,1) both; }
+.option, .category-chip, .mode-card, .lifeline, .primary-action, .secondary-action { transition: transform .12s ease, border-color .18s ease, background-color .18s ease, opacity .18s ease; }
+
+@keyframes screen-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes good-flash { 45% { box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--correct) 10%, transparent); } }
+@keyframes bad-flash { 45% { box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--wrong) 9%, transparent); } }
+@keyframes combo-pop { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.55) rotate(-8deg); } 35% { opacity: 1; transform: translate(-50%, -50%) scale(1.08) rotate(-4deg); } 100% { opacity: 0; transform: translate(-50%, -60%) scale(.96) rotate(-2deg); } }
+@keyframes confetti-fall { to { transform: translate3d(25px, 110dvh, 0) rotate(680deg); opacity: .2; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

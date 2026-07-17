@@ -1,0 +1,114 @@
+import { SOURCE_NOTE } from '../product/config.js';
+import type { Settings } from '../product/types.js';
+import { h } from './dom.js';
+
+/** Close function returned by every modal sheet. */
+export type CloseSheet = () => void;
+
+function sheet(title: string, content: Node[], onDismiss: () => void): CloseSheet {
+  const close = (): void => {
+    document.removeEventListener('keydown', onKey);
+    overlay.remove();
+    onDismiss();
+  };
+  const onKey = (event: KeyboardEvent): void => { if (event.key === 'Escape') close(); };
+  const panel = h('section', { className: 'sheet', attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': title } }, [
+    h('div', { className: 'sheet-handle' }),
+    h('div', { className: 'sheet-header' }, [
+      h('h2', { text: title }),
+      h('button', { className: 'icon-btn', text: '×', onClick: close, attrs: { type: 'button', 'aria-label': 'Close' } }),
+    ]),
+    ...content,
+  ]);
+  const overlay = h('div', { className: 'sheet-overlay' }, [panel]);
+  overlay.addEventListener('click', (event) => { if (event.target === overlay) close(); });
+  document.body.appendChild(overlay);
+  document.addEventListener('keydown', onKey);
+  requestAnimationFrame(() => overlay.classList.add('visible'));
+  panel.querySelector<HTMLButtonElement>('button')?.focus();
+  return close;
+}
+
+/** First-run and reusable how-to card. */
+export function showHowTo(onDismiss: () => void): CloseSheet {
+  const steps = [
+    ['1', 'Choose your route', 'Pick a region and one of four ways to play.'],
+    ['2', 'Answer, then learn', 'Every reveal shows the answer and a clear explanation.'],
+    ['3', 'Use one-shot assists', '50:50, Skip, and +10 seconds each work once per quiz.'],
+    ['4', 'Build a combo', 'Fast correct answers score more; streaks raise the multiplier.'],
+  ];
+  return sheet('How to play', [
+    h('p', { className: 'sheet-intro', text: 'Five questions. One quick trip around the world.' }),
+    h('div', { className: 'how-list' }, steps.map(([number, title, copy]) => h('div', { className: 'how-step' }, [
+      h('b', { text: number }), h('div', {}, [h('strong', { text: title }), h('p', { text: copy })]),
+    ]))),
+    h('button', { className: 'primary-action', text: 'Got it', onClick: () => close(), attrs: { type: 'button' } }),
+  ], onDismiss);
+  function close(): void { document.querySelector<HTMLElement>('.sheet-overlay')?.click(); }
+}
+
+/** Persisted theme, audio, and timer settings. */
+export function showSettings(
+  settings: Settings,
+  onChange: (next: Settings) => void,
+  onDismiss: () => void,
+): CloseSheet {
+  const local = { ...settings };
+  const rows: HTMLElement[] = [];
+  const addToggle = (label: string, copy: string, key: 'sound' | 'music' | 'timer'): void => {
+    const button = h('button', { className: 'toggle', attrs: { type: 'button', role: 'switch' } });
+    const update = (): void => {
+      button.textContent = local[key] ? 'On' : 'Off';
+      button.setAttribute('aria-checked', String(local[key]));
+      button.classList.toggle('on', local[key]);
+    };
+    button.addEventListener('click', () => { local[key] = !local[key]; update(); onChange({ ...local }); });
+    update();
+    rows.push(settingRow(label, copy, button));
+  };
+  const theme = h('div', { className: 'segmented' }, (['light', 'dark'] as const).map((value) => h('button', {
+    className: local.theme === value ? 'selected' : '',
+    text: value === 'light' ? '☀ Light' : '◐ Dark',
+    onClick: (event) => {
+      local.theme = value;
+      (event.currentTarget as HTMLElement).parentElement?.querySelectorAll('button').forEach((button) => button.classList.toggle('selected', button === event.currentTarget));
+      onChange({ ...local });
+    },
+    attrs: { type: 'button' },
+  })));
+  rows.push(settingRow('Appearance', 'High-contrast light or dark theme.', theme));
+  addToggle('Sound effects', 'Procedural taps, reveals, and fanfare.', 'sound');
+  addToggle('Ambient music', 'A very quiet focus tone.', 'music');
+  addToggle('Question timer', '15 seconds plus a speed bonus.', 'timer');
+  return sheet('Settings', [
+    h('div', { className: 'settings-list' }, rows),
+    h('p', { className: 'source-note', text: SOURCE_NOTE }),
+  ], onDismiss);
+}
+
+/** Confirm replacing an unfinished practice round. */
+export function showNewQuizConfirm(onConfirm: () => void, onDismiss: () => void): CloseSheet {
+  let close = (): void => undefined;
+  close = sheet('Start a new quiz?', [
+    h('p', { className: 'sheet-intro', text: 'This will replace the unfinished practice route for your current region and mode.' }),
+    h('button', { className: 'primary-action danger', text: 'Start new quiz', onClick: () => { close(); onConfirm(); }, attrs: { type: 'button' } }),
+    h('button', { className: 'secondary-action', text: 'Keep current quiz', onClick: () => close(), attrs: { type: 'button' } }),
+  ], onDismiss);
+  return close;
+}
+
+/** Pause sheet with explicit resume and save-and-exit actions. */
+export function showPause(onResume: () => void, onExit: () => void): CloseSheet {
+  let close = (): void => undefined;
+  let handled = false;
+  close = sheet('Quiz paused', [
+    h('p', { className: 'sheet-intro', text: 'The timer is stopped and your exact place is saved.' }),
+    h('button', { className: 'primary-action', text: 'Resume', onClick: () => { handled = true; close(); onResume(); }, attrs: { type: 'button' } }),
+    h('button', { className: 'secondary-action', text: 'Save & exit', onClick: () => { handled = true; close(); onExit(); }, attrs: { type: 'button' } }),
+  ], () => { if (!handled) onResume(); });
+  return close;
+}
+
+function settingRow(label: string, copy: string, control: HTMLElement): HTMLElement {
+  return h('div', { className: 'setting-row' }, [h('div', {}, [h('strong', { text: label }), h('p', { text: copy })]), control]);
+}

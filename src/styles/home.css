@@ -1,0 +1,70 @@
+.home { display: flex; flex-direction: column; gap: 20px; }
+.home-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.header-actions { display: flex; gap: 8px; }
+.brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.brand-mark {
+  display: grid; place-items: center; width: 48px; height: 48px; flex: 0 0 48px;
+  border-radius: 15px 15px 15px 5px; background: var(--text); color: var(--bg);
+  font-size: 1.35rem; font-weight: 900; box-shadow: inset 0 -3px 0 var(--category);
+}
+.brand h1 { margin: 0; font-size: 1.32rem; letter-spacing: -.04em; }
+.brand p { margin: 2px 0 0; color: var(--muted); font-size: .72rem; white-space: nowrap; }
+
+.daily-card, .continue-card {
+  position: relative; width: 100%; text-align: left; border: 0; cursor: pointer;
+}
+.daily-card {
+  display: flex; flex-direction: column; min-height: 166px; padding: 22px;
+  border-radius: 26px 26px 26px 8px; overflow: hidden;
+  background: var(--text); color: var(--bg); box-shadow: var(--shadow);
+}
+.daily-card::after {
+  content: '◎'; position: absolute; right: -17px; bottom: -42px;
+  color: var(--category); font-size: 9.5rem; line-height: 1; opacity: .9;
+}
+.daily-kicker { color: var(--category); font-size: .69rem; letter-spacing: .14em; font-weight: 900; }
+.daily-title { margin-top: 18px; max-width: 75%; font-size: 1.55rem; line-height: 1.05; letter-spacing: -.04em; }
+.daily-copy { margin-top: 8px; color: color-mix(in srgb, var(--bg) 70%, transparent); font-size: .8rem; }
+.daily-go { margin-top: auto; font-weight: 800; font-size: .82rem; }
+
+.continue-card {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center;
+  min-height: 58px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 16px;
+  background: var(--surface);
+}
+.continue-card > span:first-child { font-weight: 800; }
+.continue-copy { color: var(--muted); font-size: .72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.continue-card b { color: var(--category); font-size: .75rem; }
+
+.home-section { display: flex; flex-direction: column; gap: 11px; }
+.section-heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.section-heading h2 { margin: 0; font-size: .93rem; }
+.section-heading > span { color: var(--muted); font-size: .7rem; }
+.category-scroll { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.category-chip {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  min-height: 68px; padding: 8px 4px; border: 1px solid var(--border); border-radius: 15px;
+  background: var(--surface); color: var(--muted); font-size: .69rem; font-weight: 700; cursor: pointer;
+}
+.category-icon { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: var(--surface-2); color: var(--category); }
+.category-chip.selected { border-color: var(--category); color: var(--text); box-shadow: inset 0 -3px 0 var(--category); }
+
+.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.mode-card {
+  display: flex; align-items: center; gap: 10px; min-height: 68px; padding: 11px;
+  border: 1px solid var(--border); border-radius: 17px; background: var(--surface); text-align: left; cursor: pointer;
+}
+.mode-card.selected { border-color: var(--category); box-shadow: inset 3px 0 0 var(--category); }
+.mode-icon { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 11px; background: var(--surface-2); color: var(--category); font-weight: 900; }
+.mode-copy { display: flex; flex-direction: column; min-width: 0; }
+.mode-copy strong { font-size: .8rem; }
+.mode-copy small { margin-top: 2px; color: var(--muted); font-size: .66rem; }
+
+.stats-card { padding: 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+.streak-pill { padding: 5px 9px; border-radius: 999px; background: var(--surface-2); color: var(--text) !important; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 15px; }
+.stat-block { display: flex; flex-direction: column; text-align: center; border-right: 1px solid var(--border); }
+.stat-block:last-child { border-right: 0; }
+.stat-block strong { font-size: 1.08rem; }
+.stat-block span { color: var(--muted); font-size: .65rem; }
+.home footer { padding: 3px 0 8px; text-align: center; color: var(--muted); font-size: .62rem; }

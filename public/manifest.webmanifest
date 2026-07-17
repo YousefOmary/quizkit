@@ -1,0 +1,12 @@
+{
+  "name": "Atlas Sprint",
+  "short_name": "Atlas Sprint",
+  "description": "A fast, offline world geography challenge.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f2ec",
+  "theme_color": "#17191d",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
