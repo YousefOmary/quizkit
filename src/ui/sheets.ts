@@ -1,4 +1,7 @@
 import { SOURCE_NOTE } from '../product/config.js';
+import { MODE_INFO } from '../product/config.js';
+import type { ModeId } from '../engine/types.js';
+import { CATEGORIES } from '../product/countries.js';
 import type { Settings } from '../product/types.js';
 import { h } from './dom.js';
 import { icon } from './icons.js';
@@ -90,6 +93,60 @@ export function showSettings(
   ], onDismiss);
 }
 
+/** One compact Topic · Format · Pace chooser for practice. */
+export function showCustomize(
+  settings: Settings,
+  onStart: (next: Settings) => void,
+  onDismiss: () => void,
+): CloseSheet {
+  const local = { ...settings };
+  let close = (): void => undefined;
+  const topicButtons = CATEGORIES.map((category) => h('button', {
+    className: `choice-chip${local.categoryId === category.id ? ' selected' : ''}`,
+    onClick: (event) => {
+      local.categoryId = category.id;
+      (event.currentTarget as HTMLElement).parentElement?.querySelectorAll('button')
+        .forEach((button) => button.classList.toggle('selected', button === event.currentTarget));
+    },
+    attrs: { type: 'button' },
+  }, [icon(category.icon), document.createTextNode(category.name)]));
+  const modeButtons = (Object.keys(MODE_INFO) as ModeId[]).map((modeId) => {
+    const info = MODE_INFO[modeId];
+    return h('button', {
+      className: `format-choice${local.modeId === modeId ? ' selected' : ''}`,
+      onClick: (event) => {
+        local.modeId = modeId;
+        (event.currentTarget as HTMLElement).parentElement?.querySelectorAll('button')
+          .forEach((button) => button.classList.toggle('selected', button === event.currentTarget));
+      },
+      attrs: { type: 'button' },
+    }, [icon(info.icon), h('span', {}, [h('strong', { text: info.label }), h('small', { text: info.short })])]);
+  });
+  const paceButtons = ([false, true] as const).map((timed) => h('button', {
+    className: `pace-choice${local.timer === timed ? ' selected' : ''}`,
+    onClick: (event) => {
+      local.timer = timed;
+      (event.currentTarget as HTMLElement).parentElement?.querySelectorAll('button')
+        .forEach((button) => button.classList.toggle('selected', button === event.currentTarget));
+    },
+    attrs: { type: 'button' },
+  }, [icon(timed ? 'streak' : 'route'), h('span', {}, [
+    h('strong', { text: timed ? '15 seconds' : 'Relaxed' }),
+    h('small', { text: timed ? 'Speed bonus' : 'No timer' }),
+  ])]));
+  close = showSheet('Customize your route', [
+    h('p', { className: 'sheet-intro', text: 'Five questions · about 60 seconds' }),
+    choiceGroup('Topic', 'Choose a part of the world.', 'topic-grid', topicButtons),
+    choiceGroup('Format', 'Choose how answers work.', 'format-grid', modeButtons),
+    choiceGroup('Pace', 'Practice can be relaxed or timed.', 'pace-grid', paceButtons),
+    h('button', {
+      className: 'primary-action', text: 'Start route',
+      onClick: () => { close(); onStart({ ...local }); }, attrs: { type: 'button' },
+    }),
+  ], onDismiss);
+  return close;
+}
+
 /** Confirm replacing an unfinished practice round. */
 export function showNewQuizConfirm(onConfirm: () => void, onDismiss: () => void): CloseSheet {
   let close = (): void => undefined;
@@ -115,4 +172,10 @@ export function showPause(onResume: () => void, onExit: () => void): CloseSheet 
 
 function settingRow(label: string, copy: string, control: HTMLElement): HTMLElement {
   return h('div', { className: 'setting-row' }, [h('div', {}, [h('strong', { text: label }), h('p', { text: copy })]), control]);
+}
+
+function choiceGroup(label: string, copy: string, className: string, choices: HTMLElement[]): HTMLElement {
+  return h('fieldset', { className: 'choice-group' }, [
+    h('legend', { text: label }), h('p', { text: copy }), h('div', { className }, choices),
+  ]);
 }

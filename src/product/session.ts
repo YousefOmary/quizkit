@@ -6,6 +6,10 @@ import { getPack } from './packs.js';
 import { ROUND_SIZE, TIMER_SECONDS } from './config.js';
 import type { Category, GameSession, Settings } from './types.js';
 
+/** Frozen v1 canonical Daily route selection. Everyone gets this pack/mode. */
+export const CANONICAL_DAILY_CATEGORY_ID = 'americas' as const;
+export const CANONICAL_DAILY_MODE_ID: ModeId = 'multiple-choice';
+
 /** Stable storage key for a selected daily or practice round. */
 export function sessionKey(
   kind: QuizKind,
@@ -14,7 +18,7 @@ export function sessionKey(
   date = localDateKey(),
 ): string {
   return kind === 'daily'
-    ? `daily:${date}:${categoryId}:${modeId}`
+    ? `daily:${date}:canonical-v1`
     : `practice:${categoryId}:${modeId}`;
 }
 

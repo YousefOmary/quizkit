@@ -1,4 +1,5 @@
 import type { ModeId, QuizKind, QuizState } from '../engine/types.js';
+import type { IconName } from '../ui/icons.js';
 
 /** Region identifiers used for content, saves, and stats. */
 export type CategoryId = 'americas' | 'europe' | 'asia' | 'africa';
@@ -16,7 +17,7 @@ export interface CountryFact {
 export interface Category {
   id: CategoryId;
   name: string;
-  icon: string;
+  icon: IconName;
   accent: string;
   facts: CountryFact[];
 }

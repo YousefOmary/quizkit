@@ -3,7 +3,7 @@ import type { Category } from './types.js';
 /** Curated product content, checked against the CIA World Factbook 2025 archive. */
 export const CATEGORIES: Category[] = [
   {
-    id: 'americas', name: 'Americas', icon: '◉', accent: '#ff6b4a', facts: [
+    id: 'americas', name: 'Americas', icon: 'world', accent: '#c44a2d', facts: [
       { name: 'Canada', flag: '🇨🇦', capital: 'Ottawa', area: 9_984_670 },
       { name: 'United States', flag: '🇺🇸', capital: 'Washington, D.C.', accepted: ['Washington DC', 'Washington'], area: 9_833_517 },
       { name: 'Brazil', flag: '🇧🇷', capital: 'Brasília', accepted: ['Brasilia'], area: 8_515_770 },
@@ -13,7 +13,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: 'europe', name: 'Europe', icon: '✦', accent: '#7759f4', facts: [
+    id: 'europe', name: 'Europe', icon: 'compass', accent: '#1f6e8c', facts: [
       { name: 'France', flag: '🇫🇷', capital: 'Paris', area: 643_801 },
       { name: 'Spain', flag: '🇪🇸', capital: 'Madrid', area: 505_370 },
       { name: 'Germany', flag: '🇩🇪', capital: 'Berlin', area: 357_022 },
@@ -23,7 +23,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: 'asia', name: 'Asia', icon: '◆', accent: '#e2a600', facts: [
+    id: 'asia', name: 'Asia', icon: 'route', accent: '#b37916', facts: [
       { name: 'Mongolia', flag: '🇲🇳', capital: 'Ulaanbaatar', accepted: ['Ulan Bator'], area: 1_564_116 },
       { name: 'Thailand', flag: '🇹🇭', capital: 'Bangkok', area: 513_120 },
       { name: 'Japan', flag: '🇯🇵', capital: 'Tokyo', area: 377_915 },
@@ -33,7 +33,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: 'africa', name: 'Africa', icon: '▲', accent: '#00a77b', facts: [
+    id: 'africa', name: 'Africa', icon: 'map', accent: '#287a5a', facts: [
       { name: 'Ethiopia', flag: '🇪🇹', capital: 'Addis Ababa', area: 1_104_300 },
       { name: 'Egypt', flag: '🇪🇬', capital: 'Cairo', area: 1_001_450 },
       { name: 'Nigeria', flag: '🇳🇬', capital: 'Abuja', area: 923_768 },

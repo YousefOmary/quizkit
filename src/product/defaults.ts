@@ -7,7 +7,7 @@ export function defaultSettings(): Settings {
     sound: true,
     music: false,
     haptics: true,
-    timer: true,
+    timer: false,
     onboardingSeen: false,
     categoryId: 'americas',
     modeId: 'multiple-choice',

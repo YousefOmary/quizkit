@@ -1,4 +1,5 @@
 import type { ModeId } from '../engine/types.js';
+import type { IconName } from '../ui/icons.js';
 
 /** Stable storage namespace for the standalone product. */
 export const PRODUCT_ID = 'atlas-sprint';
@@ -24,11 +25,11 @@ export const TIMINGS = {
 } as const;
 
 /** Player-facing information for every pure rules mode. */
-export const MODE_INFO: Record<ModeId, { label: string; short: string; icon: string }> = {
-  'multiple-choice': { label: 'Pick One', short: '4 choices', icon: 'A' },
-  'true-false': { label: 'True / False', short: 'Trust your gut', icon: '✓' },
-  'type-answer': { label: 'Type It', short: 'No choices', icon: '⌨' },
-  'higher-lower': { label: 'Larger', short: 'Compare area', icon: '↕' },
+export const MODE_INFO: Record<ModeId, { label: string; short: string; icon: IconName }> = {
+  'multiple-choice': { label: 'Pick One', short: 'Four choices', icon: 'target' },
+  'true-false': { label: 'True / False', short: 'Two choices', icon: 'check' },
+  'type-answer': { label: 'Type It', short: 'No choices', icon: 'type' },
+  'higher-lower': { label: 'Larger', short: 'Compare area', icon: 'route' },
 };
 
 /** Product source note displayed offline in Settings. */
