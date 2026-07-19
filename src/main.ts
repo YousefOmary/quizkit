@@ -1,6 +1,3 @@
-import '@fontsource-variable/bricolage-grotesque/wght.css';
-import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
-import 'flag-icons/css/flag-icons.min.css';
 import './style.css';
 import { registerAllModes } from './modes/index.js';
 import { createStorage } from './platform/createStorage.js';

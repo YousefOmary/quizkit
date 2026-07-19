@@ -1,17 +1,29 @@
-const CACHE = 'atlas-sprint-v4';
+const CACHE = 'atlas-sprint-v5';
 const CORE = [
   './', './index.html', './manifest.webmanifest', './favicon.svg', './icon.svg',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png', './og.png',
 ];
 
+/** Cache one build asset and recursively include every local URL referenced by CSS. */
+async function cacheAsset(url, cache) {
+  if (await cache.match(url, { ignoreVary: true })) return;
+  const response = await fetch(url);
+  if (!response.ok) return;
+  await cache.put(url, response.clone());
+  if (!response.headers.get('content-type')?.includes('text/css')) return;
+  const base = new URL(url, self.location.href);
+  const nested = [...(await response.text()).matchAll(/url\((['"]?)([^)'"\s]+)\1\)/g)]
+    .map((match) => match[2])
+    .filter((asset) => asset && !asset.startsWith('data:'))
+    .map((asset) => new URL(asset, base).href)
+    .filter((asset) => new URL(asset).origin === self.location.origin);
+  await Promise.all(nested.map((asset) => cacheAsset(asset, cache)));
+}
+
 /** Cache every hashed asset referenced by an index.html document. */
 async function cacheAssetsFrom(html, cache) {
-  const assets = [...html.matchAll(/(?:src|href)="(\.\/assets\/[^"]+)"/g)].map((m) => m[1]);
-  await Promise.all(assets.map(async (url) => {
-    if (await cache.match(url, { ignoreVary: true })) return;
-    const response = await fetch(url);
-    if (response.ok) await cache.put(url, response);
-  }));
+  const assets = [...html.matchAll(/(?:src|href)="((?:\.\/)?assets\/[^"]+)"/g)].map((match) => match[1]);
+  await Promise.all(assets.map((url) => cacheAsset(url, cache)));
 }
 
 /** Precache the shell and its current assets so offline play always works. */

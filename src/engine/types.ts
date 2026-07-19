@@ -14,6 +14,13 @@ export type QuizKind = 'daily' | 'free';
  */
 export type AnswerInput = number | string | null;
 
+/** Serializable factual visual clue; UI decides how local assets render it. */
+export interface PresentedVisual {
+  kind: 'flag';
+  code: string;
+  alt: string;
+}
+
 /** A question shaped for display. Produced by a mode's present(). */
 export interface Presented {
   /** Question text shown to the player. */
@@ -24,6 +31,8 @@ export interface Presented {
   options: string[];
   /** Short fact shown after the answer is judged. */
   explanation?: string;
+  /** Optional offline visual clue, always paired with accessible text. */
+  visual?: PresentedVisual;
 }
 
 /** Result of judging one answer. Produced by a mode's judge(). */

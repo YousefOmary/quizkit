@@ -111,6 +111,13 @@ export function renderQuizView(root: HTMLElement, ctx: QuizViewCtx): QuizViewHan
     ])] : []),
     h('section', { className: 'question-card' }, [
       h('span', { className: 'eyebrow', text: ctx.mode }),
+      ...(ctx.presented.visual ? [h('figure', { className: 'flag-clue' }, [
+        h('span', {
+          className: `fi fi-${ctx.presented.visual.code}`,
+          attrs: { role: 'img', 'aria-label': ctx.presented.visual.alt },
+        }),
+        h('figcaption', { className: 'sr-only', text: ctx.presented.visual.alt }),
+      ])] : []),
       h('h1', { className: 'prompt', text: ctx.presented.prompt }),
     ]),
     answerArea,

@@ -37,7 +37,7 @@ export function showSheet(title: string, content: Node[], onDismiss: () => void)
 /** First-run and reusable how-to card. */
 export function showHowTo(onDismiss: () => void): CloseSheet {
   const steps = [
-    ['1', 'Choose your route', 'Pick a region and one of four ways to play.'],
+    ['1', 'Choose your route', 'Play World Mix or choose one of six world-knowledge topics.'],
     ['2', 'Answer, then learn', 'Every reveal shows the answer and a clear explanation.'],
     ['3', 'Use one-shot assists', '50:50, Skip, and +10 seconds each work once per quiz.'],
     ['4', 'Build a combo', 'Fast correct answers score more; streaks raise the multiplier.'],
@@ -137,7 +137,7 @@ export function showCustomize(
   ])]));
   close = showSheet('Customize your route', [
     h('p', { className: 'sheet-intro', text: 'Five questions · about 60 seconds' }),
-    choiceGroup('Topic', 'Choose a part of the world.', 'topic-grid', topicButtons),
+    choiceGroup('Topic', 'Choose a world-knowledge pack.', 'topic-grid', topicButtons),
     choiceGroup('Format', 'Choose how answers work.', 'format-grid', modeButtons),
     choiceGroup('Pace', 'Practice can be relaxed or timed.', 'pace-grid', paceButtons),
     h('button', {
@@ -152,7 +152,7 @@ export function showCustomize(
 export function showNewQuizConfirm(onConfirm: () => void, onDismiss: () => void): CloseSheet {
   let close = (): void => undefined;
   close = showSheet('Start a new quiz?', [
-    h('p', { className: 'sheet-intro', text: 'This will replace the unfinished practice route for your current region and mode.' }),
+    h('p', { className: 'sheet-intro', text: 'This will replace the unfinished practice route for your current topic and format.' }),
     h('button', { className: 'primary-action danger', text: 'Start new quiz', onClick: () => { close(); onConfirm(); }, attrs: { type: 'button' } }),
     h('button', { className: 'secondary-action', text: 'Keep current quiz', onClick: () => close(), attrs: { type: 'button' } }),
   ], onDismiss);

@@ -54,10 +54,10 @@ export function showJourney(
   ], () => undefined);
 }
 
-/** Every region and mode at a glance, with region mastery tiers. */
+/** Every topic and mode at a glance, with topic mastery tiers. */
 export function showStats(book: StatsBook, dailyMeta: DailyMeta): CloseSheet {
   return showSheet('Your stats', [
-    h('p', { className: 'sheet-intro', text: `Daily streak ${dailyMeta.current} · best ${dailyMeta.best}. Region mastery grows with every correct answer.` }),
+    h('p', { className: 'sheet-intro', text: `Daily streak ${dailyMeta.current} · best ${dailyMeta.best}. Topic mastery grows with every correct answer.` }),
     ...statsSections(book),
   ], () => undefined);
 }
@@ -108,7 +108,9 @@ function awardRows(progress: ProgressState): HTMLElement[] {
         h('strong', { text: def.name }),
         h('p', { text: date ? `${def.description} · Earned ${date}` : def.description }),
       ]),
-      h('span', { className: 'award-state', text: date ? '✓' : '·' }),
+      h('span', { className: 'award-state', attrs: { 'aria-label': date ? 'Earned' : 'Locked' } }, [
+        icon(date ? 'check' : 'pin'),
+      ]),
     ]);
   });
 }

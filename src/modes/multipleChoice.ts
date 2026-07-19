@@ -1,6 +1,6 @@
 import { withStateHelpers, type GameMode } from '../engine/mode.js';
 import { shuffled, type Rng } from '../engine/rng.js';
-import type { AnswerInput, Judgement, Presented } from '../engine/types.js';
+import type { AnswerInput, Judgement, Presented, PresentedVisual } from '../engine/types.js';
 
 /** One multiple-choice pack question: a prompt, the right answer, 3 wrong. */
 export interface McPackQuestion {
@@ -8,6 +8,7 @@ export interface McPackQuestion {
   correct: string;
   wrong: [string, string, string];
   explanation?: string;
+  visual?: PresentedVisual;
 }
 
 /** The question pack a multiple-choice theme supplies. */
@@ -22,6 +23,7 @@ interface McRuntime {
   options: string[];
   correctIndex: number;
   explanation?: string;
+  visual?: PresentedVisual;
 }
 
 /**
@@ -40,6 +42,7 @@ function buildQuiz(pack: unknown, rng: Rng, count: number): unknown[] {
         options,
         correctIndex: options.indexOf(q.correct),
         explanation: q.explanation,
+        ...(q.visual ? { visual: q.visual } : {}),
       };
     });
 }
@@ -47,7 +50,7 @@ function buildQuiz(pack: unknown, rng: Rng, count: number): unknown[] {
 /** Present: the prompt plus 4 option buttons. */
 function present(question: unknown): Presented {
   const q = question as McRuntime;
-  return { prompt: q.prompt, kind: 'choice', options: q.options, explanation: q.explanation };
+  return { prompt: q.prompt, kind: 'choice', options: q.options, explanation: q.explanation, visual: q.visual };
 }
 
 /**

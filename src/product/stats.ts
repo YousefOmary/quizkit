@@ -3,7 +3,7 @@ import { defaultModeStats } from './defaults.js';
 import { dayNumberForKey } from './session.js';
 import type { DailyMeta, ModeStats, StatsBook } from './types.js';
 
-/** Stable lookup key for per-region, per-mode statistics. */
+/** Stable lookup key for per-topic, per-mode statistics. */
 export function statsKey(categoryId: string, modeId: string): string {
   return `${categoryId}:${modeId}`;
 }

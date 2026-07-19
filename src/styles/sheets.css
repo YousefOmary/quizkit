@@ -96,4 +96,4 @@
 .award-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--surface-2); font-size: 1.1rem; }
 .award-copy strong { font-size: .95rem; }
 .award-copy p { margin: 2px 0 0; color: var(--muted); font-size: .875rem; line-height: 1.35; }
-.award-state { color: var(--correct); font-weight: 900; text-align: center; }
+.award-state { display: grid; place-items: center; color: var(--correct); text-align: center; }

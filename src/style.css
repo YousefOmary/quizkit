@@ -1,4 +1,6 @@
+@import './styles/fonts.css';
 @import './styles/base.css';
+@import './styles/flags.css';
 @import './styles/home.css';
 @import './styles/quiz.css';
 @import './styles/sheets.css';

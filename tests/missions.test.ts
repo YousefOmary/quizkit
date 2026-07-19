@@ -4,7 +4,7 @@ import { applyMissions, missionsForDate } from '../src/product/missions.js';
 import type { RoundSummary } from '../src/product/progress.js';
 
 const round = (over: Partial<RoundSummary> = {}): RoundSummary => ({
-  kind: 'free', modeId: 'multiple-choice', categoryId: 'americas',
+  kind: 'free', modeId: 'multiple-choice', categoryId: 'world-mix',
   correct: 3, total: 5, score: 320, usedLifeline: true, maxCombo: 3, ...over,
 });
 

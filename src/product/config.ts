@@ -34,4 +34,4 @@ export const MODE_INFO: Record<ModeId, { label: string; short: string; icon: Ico
 
 /** Product source note displayed offline in Settings. */
 export const SOURCE_NOTE =
-  'Capitals and total-area figures checked against the CIA World Factbook 2025 archive.';
+  '600 launch facts verified from UN M49, ISO 3166, the CIA World Factbook archive, and UNESCO.';

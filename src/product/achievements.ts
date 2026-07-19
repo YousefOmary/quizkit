@@ -1,4 +1,5 @@
 import { levelFromXp, type ProgressState } from './progress.js';
+import type { CategoryId } from './types.js';
 import type { IconName } from '../ui/icons.js';
 
 /**
@@ -21,6 +22,10 @@ export interface AchievementCtx {
   bestDailyStreak: number;
 }
 
+const LAUNCH_TOPICS: readonly CategoryId[] = [
+  'countries', 'flags', 'capitals', 'landmarks', 'nature', 'map-sense',
+];
+
 /** Every achievement, in display order. */
 export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'first-steps', name: 'First Steps', icon: 'route',
@@ -29,9 +34,10 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'perfect-run', name: 'Perfect Run', icon: 'spark',
     description: 'Answer every question in a round correctly.',
     earned: ({ progress }) => progress.counters.perfect >= 1 },
-  { id: 'globe-trotter', name: 'Globe Trotter', icon: 'compass',
-    description: 'Play all four regions.',
-    earned: ({ progress }) => Object.keys(progress.counters.categories).length >= 4 },
+  { id: 'globe-trotter', name: 'Pack Collector', icon: 'compass',
+    description: 'Play all six topic packs.',
+    earned: ({ progress }) => LAUNCH_TOPICS
+      .every((id) => (progress.counters.categories[id] ?? 0) > 0) },
   { id: 'polymath', name: 'Polymath', icon: 'journey',
     description: 'Play all four modes.',
     earned: ({ progress }) => Object.keys(progress.counters.modes).length >= 4 },

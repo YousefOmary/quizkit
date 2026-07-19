@@ -82,7 +82,7 @@ export function titleForLevel(level: number): string {
   return TITLES.find(([min]) => level >= min)?.[1] ?? 'Wanderer';
 }
 
-/** Mastery tiers per region, by lifetime correct answers in that region. */
+/** Mastery tiers per topic, by lifetime correct answers in that topic. */
 export const MASTERY_TIERS: Array<{ name: string; correct: number }> = [
   { name: 'Scout', correct: 0 },
   { name: 'Bronze', correct: 25 },
@@ -90,7 +90,7 @@ export const MASTERY_TIERS: Array<{ name: string; correct: number }> = [
   { name: 'Gold', correct: 150 },
 ];
 
-/** Mastery tier name for a region's lifetime correct-answer count. */
+/** Mastery tier name for a topic's lifetime correct-answer count. */
 export function masteryTier(correct: number): string {
   return [...MASTERY_TIERS].reverse().find((tier) => correct >= tier.correct)!.name;
 }
