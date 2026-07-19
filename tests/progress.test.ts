@@ -8,7 +8,7 @@ import type { RoundSummary } from '../src/product/progress.js';
 import type { GameSession } from '../src/product/types.js';
 
 const round = (over: Partial<RoundSummary> = {}): RoundSummary => ({
-  kind: 'free', modeId: 'multiple-choice', categoryId: 'americas',
+  kind: 'free', modeId: 'multiple-choice', categoryId: 'countries',
   correct: 4, total: 5, score: 480, usedLifeline: false, maxCombo: 4, ...over,
 });
 
@@ -46,7 +46,7 @@ test('applyCounters: folds one round without mutating the input', () => {
   assert.equal(next.correct, 5);
   assert.equal(next.bestScore, 700);
   assert.equal(next.modes['multiple-choice'], 1);
-  assert.equal(next.categories.americas, 1);
+  assert.equal(next.categories.countries, 1);
   const third = applyCounters(next, round({ correct: 3, score: 300 }));
   assert.equal(third.perfect, 1);
   assert.equal(third.bestScore, 700);
@@ -54,7 +54,7 @@ test('applyCounters: folds one round without mutating the input', () => {
 
 test('summarizeSession: correct counts, lifelines, and skip-safe combos', () => {
   const session = {
-    kind: 'free', modeId: 'multiple-choice', categoryId: 'europe',
+    kind: 'free', modeId: 'multiple-choice', categoryId: 'landmarks',
     lifelines: { fifty: true, skip: false, time: false },
     quiz: {
       score: 510,

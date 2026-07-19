@@ -24,6 +24,13 @@ test('stats: accuracy, best score, and skipped-streak behavior', () => {
   assert.equal(result.currentStreak, 0);
 });
 
+test('stats: assisted practice counts learning but cannot set a best score', () => {
+  const result = applyRound(defaultModeStats(), state, false);
+  assert.equal(result.played, 1);
+  assert.equal(result.correct, 2);
+  assert.equal(result.bestScore, 0);
+});
+
 test('daily streak: same day is idempotent, adjacent day increments', () => {
   const dayOne = applyDaily(defaultDailyMeta(), '2026-07-17');
   assert.deepEqual(applyDaily(dayOne, '2026-07-17'), dayOne);

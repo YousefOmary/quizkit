@@ -1,12 +1,13 @@
 import { withStateHelpers, type GameMode } from '../engine/mode.js';
 import { shuffled, type Rng } from '../engine/rng.js';
-import type { AnswerInput, Judgement, Presented } from '../engine/types.js';
+import type { AnswerInput, Judgement, Presented, PresentedVisual } from '../engine/types.js';
 
 /** One true/false pack question: a statement and whether it is true. */
 export interface TfPackQuestion {
   statement: string;
   isTrue: boolean;
   explanation?: string;
+  visual?: PresentedVisual;
 }
 
 /** The question pack a true/false theme supplies. */
@@ -23,6 +24,7 @@ interface TfRuntime {
   isTrue: boolean;
   labels: [string, string];
   explanation?: string;
+  visual?: PresentedVisual;
 }
 
 /**
@@ -40,7 +42,7 @@ function buildQuiz(pack: unknown, rng: Rng, count: number): unknown[] {
 /** Present: the statement plus two option buttons (option 0 = "true"). */
 function present(question: unknown): Presented {
   const q = question as TfRuntime;
-  return { prompt: q.statement, kind: 'choice', options: [...q.labels], explanation: q.explanation };
+  return { prompt: q.statement, kind: 'choice', options: [...q.labels], explanation: q.explanation, visual: q.visual };
 }
 
 /**

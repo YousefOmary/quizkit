@@ -6,6 +6,10 @@ import { getPack } from './packs.js';
 import { ROUND_SIZE, TIMER_SECONDS } from './config.js';
 import type { Category, GameSession, Settings } from './types.js';
 
+/** Frozen v1 canonical Daily route selection. Everyone gets this pack/mode. */
+export const CANONICAL_DAILY_CATEGORY_ID = 'world-mix' as const;
+export const CANONICAL_DAILY_MODE_ID: ModeId = 'multiple-choice';
+
 /** Stable storage key for a selected daily or practice round. */
 export function sessionKey(
   kind: QuizKind,
@@ -14,7 +18,7 @@ export function sessionKey(
   date = localDateKey(),
 ): string {
   return kind === 'daily'
-    ? `daily:${date}:${categoryId}:${modeId}`
+    ? `daily:${date}:canonical-v1`
     : `practice:${categoryId}:${modeId}`;
 }
 
@@ -56,6 +60,42 @@ export function createSession(
       questionsPerRound: ROUND_SIZE,
       timerSeconds,
     }),
+  };
+}
+
+/**
+ * Build the one-question assisted retry unlocked after an optional rewarded
+ * practice boundary. Daily sessions and perfect rounds can never enter.
+ */
+export function createPracticeRetry(source: GameSession): GameSession | null {
+  if (source.kind !== 'free' || source.quiz.status !== 'finished' || source.rewardedRetryUsed) return null;
+  const missed = source.quiz.answers.findIndex((answer) => !answer.correct && !answer.skipped);
+  if (missed < 0) return null;
+  const question = source.quiz.questions[missed];
+  if (question === undefined) return null;
+  return {
+    version: 1,
+    key: `practice-retry:${source.categoryId}:${source.modeId}:${source.dateKey}`,
+    dateKey: source.dateKey,
+    categoryId: source.categoryId,
+    modeId: source.modeId,
+    kind: 'free',
+    assisted: true,
+    rewardedRetryUsed: true,
+    lifelines: { fifty: true, skip: true, time: true },
+    eliminated: [],
+    timerLeft: source.quiz.timerSeconds,
+    quiz: {
+      ...source.quiz,
+      kind: 'free',
+      dayNumber: 0,
+      questions: [question],
+      index: 0,
+      answers: [],
+      score: 0,
+      streakInQuiz: 0,
+      status: 'playing',
+    },
   };
 }
 

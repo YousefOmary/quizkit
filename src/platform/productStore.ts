@@ -36,12 +36,12 @@ export class ProductStore {
     return this.write('settings', settings);
   }
 
-  /** Load all per-region/mode stats. */
+  /** Load all per-topic/mode stats. */
   loadStats(): Promise<StatsBook> {
     return this.read('stats', {});
   }
 
-  /** Persist all per-region/mode stats. */
+  /** Persist all per-topic/mode stats. */
   saveStats(stats: StatsBook): Promise<void> {
     return this.write('stats', stats);
   }

@@ -1,29 +1,41 @@
 # Atlas Sprint
 
-Atlas Sprint is a polished, offline-first mobile geography game built with
-vanilla TypeScript and the DOM. Pick a world region, choose one of four quiz
-modes, and complete a deterministic daily route or an unlimited practice run.
+Atlas Sprint is an offline-first world-knowledge game built with vanilla
+TypeScript and the DOM. Quick Play starts a relaxed five-question World Mix in
+one tap; the canonical Daily is one fair, deterministic, 15-second route for
+everyone.
 
 ## Product features
 
+- Six frozen launch packs: Countries, Flags & Shapes, Capitals & Cities,
+  Landmarks, Nature, and Map Sense
+- 600 atomic facts with stable IDs, difficulty tiers, source editions,
+  verification dates, and ambiguity/locale notes
 - Multiple choice, true/false, type-answer, and higher/lower modes
-- Daily routes per region and mode, with a same-day completion guard;
-  the Daily is always timed so canonical scores stay fair for everyone
-- Exact in-progress resume, including timer and lifelines
-- 50:50 (four-choice questions only), Skip, and +10-second lifelines
-- Time bonuses, combo multipliers, route stats, and daily streaks
-- XP levels with titles, region mastery tiers, three deterministic
-  daily goals, and ten local achievements
-- Light/dark/system themes, gesture-gated procedural Web Audio, and
-  optional haptics with a graceful no-op fallback
-- Native share sheet with clipboard fallback, spoiler-free emoji grid
-- Dormant, fully tested monetization/analytics boundaries: a no-op ad
-  adapter plus a pure placement policy (no SDK, no ads, no tracking)
-- Fully local PWA assets, service-worker caching, no ads or server claims
+- One canonical Daily route seeded from `dateKey|packId`, with current and best
+  streaks plus compact, spoiler-free sharing
+- Exact in-progress resume, timer and lifelines included
+- Optional one-question rewarded retry in practice only; assisted rounds cannot
+  set competitive bests, and the no-ad adapter remains the default
+- Local progression: XP, titles, topic mastery, daily goals, and achievements,
+  all collected in the Journey sheet
+- Self-hosted Latin WOFF2 fonts, a single SVG UI icon language, 100 bundled SVG
+  flags, and fully local PWA/OG assets
+- Light/dark/system themes, an in-app motion control, OS reduced-motion support,
+  semantic feedback labels, and screen-reader timer announcements
+- Service-worker precaching for the complete shell, fonts, and flag atlas; no
+  remote runtime requests, accounts, tracking, leaderboards, or challenges
 
-The bundled content is one curated dataset of 24 countries across the
-Americas, Europe, Asia, and Africa. Capitals and total-area figures were
-checked against the CIA World Factbook 2025 archive.
+## Content provenance
+
+The launch set uses 100 unambiguous UN member countries and 100 single-state
+UNESCO properties. It is generated and editorially frozen by
+`scripts/build-content.mjs`. Country groupings use UN M49, codes and flags use
+ISO 3166, capitals and total areas are cross-checked against the final CIA World
+Factbook archive, and landmark titles/locations use the UNESCO World Heritage
+List. Automated checks enforce six 100-fact packs, a 50/35/15 difficulty split,
+unique IDs and areas, local flag coverage, approved primary-source domains, and
+representative capital fixtures.
 
 ## Commands
 
@@ -40,11 +52,12 @@ GitHub Pages deployment runs from `.github/workflows/deploy.yml` on pushes to
 ## Structure
 
 ```text
+scripts/       source-verifying launch-content generator
 src/engine/    pure quiz state, seeded RNG, scoring, normalization, sharing
 src/modes/     the four unchanged rules modules
-src/product/   content, packs, sessions, stats, progression, goals, ad policy
-src/ui/        semantic DOM screens, timer lifecycle, and mobile keyboard
+src/product/   frozen content, packs, sessions, stats, progression, policy
+src/ui/        semantic DOM screens, timer lifecycle, sheets, and owned icons
 src/audio/     one shared procedural audio graph
 src/platform/  storage, haptics, analytics, and monetization adapters
-tests/         engine, content, progression, policy, and save/restore tests
+tests/         engine, content, progression, policy, and save/restore checks
 ```

@@ -1,7 +1,7 @@
 import { withStateHelpers, type GameMode } from '../engine/mode.js';
 import { matchesAnswer } from '../engine/normalize.js';
 import { shuffled, type Rng } from '../engine/rng.js';
-import type { AnswerInput, Judgement, Presented } from '../engine/types.js';
+import type { AnswerInput, Judgement, Presented, PresentedVisual } from '../engine/types.js';
 
 /**
  * One type-answer pack question. acceptedAnswers[0] is the canonical
@@ -12,6 +12,7 @@ export interface TaPackQuestion {
   prompt: string;
   acceptedAnswers: string[];
   explanation?: string;
+  visual?: PresentedVisual;
 }
 
 /** The question pack a type-answer theme supplies. */
@@ -32,7 +33,7 @@ function buildQuiz(pack: unknown, rng: Rng, count: number): unknown[] {
 /** Present: the prompt with a free-text input (no options). */
 function present(question: unknown): Presented {
   const q = question as TaPackQuestion;
-  return { prompt: q.prompt, kind: 'text', options: [], explanation: q.explanation };
+  return { prompt: q.prompt, kind: 'text', options: [], explanation: q.explanation, visual: q.visual };
 }
 
 /**

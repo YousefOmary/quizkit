@@ -15,8 +15,9 @@ function resolveTheme(theme: Settings['theme']): 'light' | 'dark' {
 export function applyPreferences(settings: Settings): void {
   const theme = resolveTheme(settings.theme);
   document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.motion = settings.motion ? 'full' : 'reduced';
   const themeMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-  themeMeta?.setAttribute('content', theme === 'dark' ? '#101217' : '#f4f2ec');
+  themeMeta?.setAttribute('content', theme === 'dark' ? '#0f1820' : '#f7f2e8');
   applyCategory(settings.categoryId);
   audio.setPreferences(settings.sound, settings.music);
   haptics.setEnabled(settings.haptics);

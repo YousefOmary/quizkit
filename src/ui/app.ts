@@ -1,25 +1,28 @@
 import { audio } from '../audio/audioCore.js';
 import { localDateKey } from '../engine/daily.js';
 import { shareText } from '../engine/share.js';
-import type { ModeId } from '../engine/types.js';
 import { analytics } from '../platform/analytics.js';
+import { monetization } from '../platform/monetization.js';
+import { canOfferRewarded } from '../product/adPolicy.js';
 import type { ProductStore } from '../platform/productStore.js';
 import { ACHIEVEMENTS } from '../product/achievements.js';
 import { getCategory } from '../product/countries.js';
 import { PRODUCT_NAME } from '../product/config.js';
 import { missionsForDate } from '../product/missions.js';
 import { levelFromXp, titleForLevel, type ProgressState } from '../product/progress.js';
-import { createSession, sessionKey } from '../product/session.js';
+import {
+  CANONICAL_DAILY_CATEGORY_ID, CANONICAL_DAILY_MODE_ID, createPracticeRetry, createSession, sessionKey,
+} from '../product/session.js';
 import { recordResult, type RoundReward } from '../product/recordResult.js';
 import { getStats } from '../product/stats.js';
-import type { CategoryId, DailyMeta, GameSession, Settings, StatsBook } from '../product/types.js';
-import { renderMenuView, type HomeHandle, type HomeState, type JourneyState } from './menuView.js';
+import type { DailyMeta, GameSession, Settings, StatsBook } from '../product/types.js';
+import { renderMenuView, type HomeState, type JourneyState } from './menuView.js';
 import { PlaySession } from './playSession.js';
 import { applyCategory, applyPreferences, watchSystemTheme } from './preferences.js';
 import { renderResultsView } from './resultsView.js';
-import { shareOrCopy } from './share.js';
-import { showHowTo, showNewQuizConfirm, showPause, showSettings } from './sheets.js';
-import { showAchievements, showStats } from './sheetsProgress.js';
+import { copyText } from './clipboard.js';
+import { showCustomize, showHowTo, showNewQuizConfirm, showPause, showSettings } from './sheets.js';
+import { showJourney } from './sheetsProgress.js';
 
 /** Product-level navigation, persistence, and meta progression. */
 export class App {
@@ -27,7 +30,6 @@ export class App {
   private stats!: StatsBook;
   private dailyMeta!: DailyMeta;
   private progress!: ProgressState;
-  private home: HomeHandle | null = null;
   private player: PlaySession | null = null;
   constructor(
     private readonly root: HTMLElement,
@@ -55,15 +57,13 @@ export class App {
     this.player?.dispose();
     this.player = null;
     const state = await this.homeState();
-    this.home = renderMenuView(this.root, state, {
-      onSelection: (categoryId, modeId) => void this.select(categoryId, modeId),
+    renderMenuView(this.root, state, {
+      onQuickPlay: () => void this.quickPlay(),
       onDaily: () => void this.startDaily(),
-      onPractice: () => void this.requestPractice(),
-      onContinue: () => void this.continueActive(),
+      onCustomize: () => this.openCustomize(),
+      onJourney: () => showJourney(this.journeyState(), this.stats, this.dailyMeta, this.progress),
       onSettings: () => this.openSettings(),
       onHelp: () => showHowTo(() => undefined),
-      onStats: () => void showStats(this.stats, this.dailyMeta),
-      onAwards: () => void showAchievements(this.progress),
     });
   }
   private journeyState(): JourneyState {
@@ -83,32 +83,32 @@ export class App {
     };
   }
   private async homeState(): Promise<HomeState> {
-    const { categoryId, modeId } = this.settings;
-    const daily = await this.store.loadSession(sessionKey('daily', categoryId, modeId));
+    const daily = await this.store.loadSession(sessionKey(
+      'daily', CANONICAL_DAILY_CATEGORY_ID, CANONICAL_DAILY_MODE_ID,
+    ));
     const active = await this.store.loadActiveSession();
     return {
-      categoryId,
-      modeId,
+      settings: this.settings,
       dailyStatus: !daily ? 'new' : daily.quiz.status === 'finished' ? 'done' : 'resume',
-      stats: getStats(this.stats, categoryId, modeId),
       dailyMeta: this.dailyMeta,
       active,
       journey: this.journeyState(),
     };
   }
-  private async select(categoryId: CategoryId, modeId: ModeId): Promise<void> {
-    this.settings.categoryId = categoryId;
-    this.settings.modeId = modeId;
-    applyCategory(categoryId);
-    void this.store.saveSettings(this.settings);
-    this.home?.update(await this.homeState());
+  private async quickPlay(): Promise<void> {
+    const active = await this.store.loadActiveSession();
+    if (active?.quiz.status === 'playing') {
+      this.play(active);
+      return;
+    }
+    await this.requestPractice();
   }
   private async startDaily(): Promise<void> {
     void audio.unlock();
-    const category = getCategory(this.settings.categoryId);
-    const key = sessionKey('daily', category.id, this.settings.modeId);
+    const category = getCategory(CANONICAL_DAILY_CATEGORY_ID);
+    const key = sessionKey('daily', category.id, CANONICAL_DAILY_MODE_ID);
     const saved = await this.store.loadSession(key);
-    const session = saved ?? createSession(category, this.settings.modeId, 'daily', this.settings);
+    const session = saved ?? createSession(category, CANONICAL_DAILY_MODE_ID, 'daily', this.settings);
     saved?.quiz.status === 'finished' ? await this.showResults(session) : this.play(session);
   }
   private async requestPractice(): Promise<void> {
@@ -125,16 +125,13 @@ export class App {
     const session = createSession(getCategory(categoryId), modeId, 'free', this.settings);
     this.play(session);
   }
-  private async continueActive(): Promise<void> {
-    const session = await this.store.loadActiveSession();
-    if (!session) return;
-    session.quiz.status === 'finished' ? await this.showResults(session) : this.play(session);
-  }
   private play(session: GameSession): void {
-    this.settings.categoryId = session.categoryId;
-    this.settings.modeId = session.modeId;
+    if (session.kind === 'free') {
+      this.settings.categoryId = session.categoryId;
+      this.settings.modeId = session.modeId;
+      void this.store.saveSettings(this.settings);
+    }
     applyCategory(session.categoryId);
-    void this.store.saveSettings(this.settings);
     void this.store.saveSession(session);
     analytics.track({
       name: 'quiz_started', kind: session.kind, modeId: session.modeId,
@@ -166,9 +163,10 @@ export class App {
       stats: getStats(this.stats, session.categoryId, session.modeId),
       dailyMeta: this.dailyMeta,
       reward,
-      onShare: () => this.share(session),
+      onCopy: () => this.copyResult(session),
       onAgain: () => this.newPractice(session.categoryId, session.modeId),
       onMenu: () => void this.showHome(),
+      ...(this.canRetry(session) ? { onRetry: () => this.rewardedRetry(session) } : {}),
     });
   }
   private trackCompletion(session: GameSession, reward: RoundReward): void {
@@ -188,13 +186,29 @@ export class App {
       audio.milestone();
     }
   }
-  private async share(session: GameSession) {
-    const template = session.kind === 'daily'
-      ? '{name} · Day {day} · {correct}/{total} · {score} pts'
-      : '{name} · Practice · {correct}/{total} · {score} pts';
-    const outcome = await shareOrCopy(shareText(template, PRODUCT_NAME, session.quiz));
-    analytics.track({ name: 'result_shared', kind: session.kind, outcome });
-    return outcome;
+  private async copyResult(session: GameSession): Promise<boolean> {
+    const copied = await copyText(shareText(
+      PRODUCT_NAME, session.quiz, this.dailyMeta.current, this.dailyMeta.best,
+    ));
+    analytics.track({ name: 'result_shared', kind: session.kind, outcome: copied ? 'copied' : 'failed' });
+    return copied;
+  }
+  private canRetry(session: GameSession): boolean {
+    return canOfferRewarded(session.kind)
+      && !session.rewardedRetryUsed
+      && session.quiz.answers.some((answer) => !answer.correct && !answer.skipped)
+      && monetization.isRewardedReady('practice-rewarded-lifeline');
+  }
+  private async rewardedRetry(source: GameSession): Promise<boolean> {
+    if (!this.canRetry(source)) return false;
+    const result = await monetization.showRewarded('practice-rewarded-lifeline');
+    if (result !== 'completed') return false;
+    const retry = createPracticeRetry(source);
+    if (!retry) return false;
+    source.rewardedRetryUsed = true;
+    await this.store.saveSession(source);
+    this.play(retry);
+    return true;
   }
   private openSettings(): void {
     showSettings(this.settings, (next, key) => {
@@ -202,6 +216,14 @@ export class App {
       applyPreferences(this.settings);
       void this.store.saveSettings(next);
       analytics.track({ name: 'settings_changed', key });
+    }, () => undefined);
+  }
+  private openCustomize(): void {
+    showCustomize(this.settings, (next) => {
+      this.settings = next;
+      applyPreferences(next);
+      void this.store.saveSettings(next);
+      this.newPractice(next.categoryId, next.modeId);
     }, () => undefined);
   }
 }

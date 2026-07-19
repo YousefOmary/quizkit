@@ -24,7 +24,9 @@ test('achievements: thresholds unlock and never re-report', () => {
 test('achievements: breadth and lifetime conditions', () => {
   const progress = defaultProgress();
   progress.counters.modes = { 'multiple-choice': 1, 'true-false': 1, 'type-answer': 1, 'higher-lower': 1 };
-  progress.counters.categories = { americas: 1, europe: 1, asia: 1, africa: 1 };
+  progress.counters.categories = {
+    countries: 1, flags: 1, capitals: 1, landmarks: 1, nature: 1, 'map-sense': 1,
+  };
   progress.counters.correct = 100;
   progress.counters.missions = 10;
   progress.xp = 1000; // well past level 5

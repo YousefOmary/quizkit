@@ -7,14 +7,15 @@ export function defaultSettings(): Settings {
     sound: true,
     music: false,
     haptics: true,
-    timer: true,
+    motion: true,
+    timer: false,
     onboardingSeen: false,
-    categoryId: 'americas',
+    categoryId: 'world-mix',
     modeId: 'multiple-choice',
   };
 }
 
-/** Empty stats for one region/mode pairing. */
+/** Empty stats for one topic/mode pairing. */
 export function defaultModeStats(): ModeStats {
   return { played: 0, correct: 0, answered: 0, bestScore: 0, currentStreak: 0, bestStreak: 0 };
 }

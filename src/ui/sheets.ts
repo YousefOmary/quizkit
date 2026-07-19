@@ -1,6 +1,10 @@
 import { SOURCE_NOTE } from '../product/config.js';
+import { MODE_INFO } from '../product/config.js';
+import type { ModeId } from '../engine/types.js';
+import { CATEGORIES } from '../product/countries.js';
 import type { Settings } from '../product/types.js';
 import { h } from './dom.js';
+import { icon } from './icons.js';
 
 /** Close function returned by every modal sheet. */
 export type CloseSheet = () => void;
@@ -17,7 +21,7 @@ export function showSheet(title: string, content: Node[], onDismiss: () => void)
     h('div', { className: 'sheet-handle' }),
     h('div', { className: 'sheet-header' }, [
       h('h2', { text: title }),
-      h('button', { className: 'icon-btn', text: '×', onClick: close, attrs: { type: 'button', 'aria-label': 'Close' } }),
+      h('button', { className: 'icon-btn', onClick: close, attrs: { type: 'button', 'aria-label': 'Close' } }, [icon('close')]),
     ]),
     ...content,
   ]);
@@ -33,7 +37,7 @@ export function showSheet(title: string, content: Node[], onDismiss: () => void)
 /** First-run and reusable how-to card. */
 export function showHowTo(onDismiss: () => void): CloseSheet {
   const steps = [
-    ['1', 'Choose your route', 'Pick a region and one of four ways to play.'],
+    ['1', 'Choose your route', 'Play World Mix or choose one of six world-knowledge topics.'],
     ['2', 'Answer, then learn', 'Every reveal shows the answer and a clear explanation.'],
     ['3', 'Use one-shot assists', '50:50, Skip, and +10 seconds each work once per quiz.'],
     ['4', 'Build a combo', 'Fast correct answers score more; streaks raise the multiplier.'],
@@ -56,7 +60,7 @@ export function showSettings(
 ): CloseSheet {
   const local = { ...settings };
   const rows: HTMLElement[] = [];
-  const addToggle = (label: string, copy: string, key: 'sound' | 'music' | 'haptics' | 'timer'): void => {
+  const addToggle = (label: string, copy: string, key: 'sound' | 'music' | 'haptics' | 'timer' | 'motion'): void => {
     const button = h('button', { className: 'toggle', attrs: { type: 'button', role: 'switch' } });
     const update = (): void => {
       button.textContent = local[key] ? 'On' : 'Off';
@@ -67,7 +71,7 @@ export function showSettings(
     update();
     rows.push(settingRow(label, copy, button));
   };
-  const THEME_LABELS = { light: '☀ Light', dark: '◐ Dark', system: 'Auto' } as const;
+  const THEME_LABELS = { light: 'Light', dark: 'Dark', system: 'Auto' } as const;
   const theme = h('div', { className: 'segmented' }, (['light', 'dark', 'system'] as const).map((value) => h('button', {
     className: local.theme === value ? 'selected' : '',
     text: THEME_LABELS[value],
@@ -82,6 +86,7 @@ export function showSettings(
   addToggle('Sound effects', 'Procedural taps, reveals, and fanfare.', 'sound');
   addToggle('Ambient music', 'A very quiet focus tone.', 'music');
   addToggle('Vibration', 'Tiny pulses on answers, where supported.', 'haptics');
+  addToggle('Travel motion', 'Route drawing and reward movement.', 'motion');
   addToggle('Practice timer', '15s + speed bonus. The Daily is always timed so scores stay fair.', 'timer');
   return showSheet('Settings', [
     h('div', { className: 'settings-list' }, rows),
@@ -89,11 +94,70 @@ export function showSettings(
   ], onDismiss);
 }
 
+/** One compact Topic · Format · Pace chooser for practice. */
+export function showCustomize(
+  settings: Settings,
+  onStart: (next: Settings) => void,
+  onDismiss: () => void,
+): CloseSheet {
+  const local = { ...settings };
+  let close = (): void => undefined;
+  const selectChoice = (event: Event): void => {
+    const selected = event.currentTarget as HTMLElement;
+    selected.parentElement?.querySelectorAll('button').forEach((button) => {
+      const active = button === selected;
+      button.classList.toggle('selected', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  };
+  const topicButtons = CATEGORIES.map((category) => h('button', {
+    className: `choice-chip${local.categoryId === category.id ? ' selected' : ''}`,
+    onClick: (event) => {
+      local.categoryId = category.id;
+      selectChoice(event);
+    },
+    attrs: { type: 'button', 'aria-pressed': String(local.categoryId === category.id) },
+  }, [icon(category.icon), document.createTextNode(category.name)]));
+  const modeButtons = (Object.keys(MODE_INFO) as ModeId[]).map((modeId) => {
+    const info = MODE_INFO[modeId];
+    return h('button', {
+      className: `format-choice${local.modeId === modeId ? ' selected' : ''}`,
+      onClick: (event) => {
+        local.modeId = modeId;
+        selectChoice(event);
+      },
+      attrs: { type: 'button', 'aria-pressed': String(local.modeId === modeId) },
+    }, [icon(info.icon), h('span', {}, [h('strong', { text: info.label }), h('small', { text: info.short })])]);
+  });
+  const paceButtons = ([false, true] as const).map((timed) => h('button', {
+    className: `pace-choice${local.timer === timed ? ' selected' : ''}`,
+    onClick: (event) => {
+      local.timer = timed;
+      selectChoice(event);
+    },
+    attrs: { type: 'button', 'aria-pressed': String(local.timer === timed) },
+  }, [icon(timed ? 'streak' : 'route'), h('span', {}, [
+    h('strong', { text: timed ? '15 seconds' : 'Relaxed' }),
+    h('small', { text: timed ? 'Speed bonus' : 'No timer' }),
+  ])]));
+  close = showSheet('Customize your route', [
+    h('p', { className: 'sheet-intro', text: 'Five questions · about 60 seconds' }),
+    choiceGroup('Topic', 'Choose a world-knowledge pack.', 'topic-grid', topicButtons),
+    choiceGroup('Format', 'Choose how answers work.', 'format-grid', modeButtons),
+    choiceGroup('Pace', 'Practice can be relaxed or timed.', 'pace-grid', paceButtons),
+    h('button', {
+      className: 'primary-action', text: 'Start route',
+      onClick: () => { close(); onStart({ ...local }); }, attrs: { type: 'button' },
+    }),
+  ], onDismiss);
+  return close;
+}
+
 /** Confirm replacing an unfinished practice round. */
 export function showNewQuizConfirm(onConfirm: () => void, onDismiss: () => void): CloseSheet {
   let close = (): void => undefined;
   close = showSheet('Start a new quiz?', [
-    h('p', { className: 'sheet-intro', text: 'This will replace the unfinished practice route for your current region and mode.' }),
+    h('p', { className: 'sheet-intro', text: 'This will replace the unfinished practice route for your current topic and format.' }),
     h('button', { className: 'primary-action danger', text: 'Start new quiz', onClick: () => { close(); onConfirm(); }, attrs: { type: 'button' } }),
     h('button', { className: 'secondary-action', text: 'Keep current quiz', onClick: () => close(), attrs: { type: 'button' } }),
   ], onDismiss);
@@ -114,4 +178,10 @@ export function showPause(onResume: () => void, onExit: () => void): CloseSheet 
 
 function settingRow(label: string, copy: string, control: HTMLElement): HTMLElement {
   return h('div', { className: 'setting-row' }, [h('div', {}, [h('strong', { text: label }), h('p', { text: copy })]), control]);
+}
+
+function choiceGroup(label: string, copy: string, className: string, choices: HTMLElement[]): HTMLElement {
+  return h('fieldset', { className: 'choice-group' }, [
+    h('legend', { text: label }), h('p', { text: copy }), h('div', { className }, choices),
+  ]);
 }
