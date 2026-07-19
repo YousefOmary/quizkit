@@ -20,9 +20,10 @@
   background: var(--text); color: var(--bg); box-shadow: var(--shadow);
 }
 .daily-card::after {
-  content: '◎'; position: absolute; right: -17px; bottom: -42px;
-  color: var(--category); font-size: 9.5rem; line-height: 1; opacity: .9;
+  content: ''; position: absolute; right: -38px; bottom: -52px; width: 148px; height: 148px;
+  border: 22px double var(--category); border-radius: 50%; opacity: .9;
 }
+.daily-card::before { content: ''; position: absolute; right: 42px; bottom: 42px; width: 46px; height: 3px; border-radius: 99px; background: var(--category); transform: rotate(-35deg); transform-origin: right; }
 .daily-kicker { color: var(--category); font-size: .69rem; letter-spacing: .14em; font-weight: 900; }
 .daily-title { margin-top: 18px; max-width: 75%; font-size: 1.55rem; line-height: 1.05; letter-spacing: -.04em; }
 .daily-copy { margin-top: 8px; color: color-mix(in srgb, var(--bg) 70%, transparent); font-size: .8rem; }
@@ -47,7 +48,8 @@
   min-height: 68px; padding: 8px 4px; border: 1px solid var(--border); border-radius: 15px;
   background: var(--surface); color: var(--muted); font-size: .69rem; font-weight: 700; cursor: pointer;
 }
-.category-icon { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: var(--surface-2); color: var(--category); }
+.category-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px 10px 10px 4px; background: var(--surface-2); color: var(--category); }
+.category-icon .atlas-icon { width: 19px; height: 19px; }
 .category-chip.selected { border-color: var(--category); color: var(--text); box-shadow: inset 0 -3px 0 var(--category); }
 
 .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
@@ -57,12 +59,14 @@
 }
 .mode-card.selected { border-color: var(--category); box-shadow: inset 3px 0 0 var(--category); }
 .mode-icon { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 11px; background: var(--surface-2); color: var(--category); font-weight: 900; }
+.mode-icon .atlas-icon { width: 21px; height: 21px; }
 .mode-copy { display: flex; flex-direction: column; min-width: 0; }
 .mode-copy strong { font-size: .8rem; }
 .mode-copy small { margin-top: 2px; color: var(--muted); font-size: .66rem; }
 
 .stats-card { padding: 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
-.streak-pill { padding: 5px 9px; border-radius: 999px; background: var(--surface-2); color: var(--text) !important; }
+.streak-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 999px; background: var(--surface-2); color: var(--text) !important; font-variant-numeric: tabular-nums; }
+.streak-pill .atlas-icon { width: 14px; height: 14px; color: var(--category); }
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 15px; }
 .stat-block { display: flex; flex-direction: column; text-align: center; border-right: 1px solid var(--border); }
 .stat-block:last-child { border-right: 0; }
@@ -84,6 +88,7 @@
 .goals-list { display: flex; flex-direction: column; gap: 4px; margin-top: 7px; }
 .goal-row { display: grid; grid-template-columns: 20px 1fr auto; gap: 7px; align-items: center; padding: 6px 0; font-size: .74rem; }
 .goal-tick { display: grid; place-items: center; width: 19px; height: 19px; border-radius: 50%; background: var(--surface-2); color: var(--muted); font-size: .62rem; font-weight: 900; }
+.goal-tick .atlas-icon { width: 12px; height: 12px; }
 .goal-row.done .goal-tick { background: var(--correct-soft); color: var(--correct); }
 .goal-row.done .goal-label { color: var(--muted); text-decoration: line-through; }
 .goal-count { color: var(--muted); font-size: .66rem; font-variant-numeric: tabular-nums; }
@@ -96,3 +101,10 @@
 }
 
 .home footer { padding: 3px 0 8px; text-align: center; color: var(--muted); font-size: .62rem; }
+
+@media (max-height: 700px) {
+  .home { gap: 14px; }
+  .daily-card { min-height: 142px; padding: 18px; }
+  .daily-title { margin-top: 12px; }
+  .category-chip, .mode-card { min-height: 62px; }
+}

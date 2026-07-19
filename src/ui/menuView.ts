@@ -1,8 +1,9 @@
 import type { ModeId } from '../engine/types.js';
 import { CATEGORIES } from '../product/countries.js';
-import { MODE_INFO, PRODUCT_NAME } from '../product/config.js';
+import { MODE_INFO, PRODUCT_NAME, ROUND_SIZE } from '../product/config.js';
 import type { CategoryId, DailyMeta, GameSession, ModeStats } from '../product/types.js';
 import { clearChildren, h } from './dom.js';
+import { atlasIcon } from './icons.js';
 
 /** Progression summary the home hub displays. */
 export interface JourneyState {
@@ -51,7 +52,7 @@ export function renderMenuView(root: HTMLElement, state: HomeState, actions: Hom
     onClick: () => actions.onSelection(category.id, current.modeId),
     attrs: { type: 'button', 'data-category': category.id },
   }, [
-    h('span', { className: 'category-icon', text: category.icon }),
+    h('span', { className: 'category-icon' }, [atlasIcon(category.icon)]),
     h('span', { text: category.name }),
   ]));
   const modeIds = Object.keys(MODE_INFO) as ModeId[];
@@ -62,7 +63,7 @@ export function renderMenuView(root: HTMLElement, state: HomeState, actions: Hom
       onClick: () => actions.onSelection(current.categoryId, modeId),
       attrs: { type: 'button', 'data-mode': modeId },
     }, [
-      h('span', { className: 'mode-icon', text: info.icon }),
+      h('span', { className: 'mode-icon' }, [atlasIcon(info.icon)]),
       h('span', { className: 'mode-copy' }, [h('strong', { text: info.label }), h('small', { text: info.short })]),
     ]);
   });
@@ -102,8 +103,8 @@ export function renderMenuView(root: HTMLElement, state: HomeState, actions: Hom
         h('h1', { text: PRODUCT_NAME }), h('p', { text: 'Know the world. Beat the clock.' }),
       ])]),
       h('div', { className: 'header-actions' }, [
-        h('button', { className: 'icon-btn', text: '?', onClick: actions.onHelp, attrs: { type: 'button', 'aria-label': 'How to play' } }),
-        h('button', { className: 'icon-btn', text: '⚙', onClick: actions.onSettings, attrs: { type: 'button', 'aria-label': 'Settings' } }),
+        h('button', { className: 'icon-btn', onClick: actions.onHelp, attrs: { type: 'button', 'aria-label': 'How to play' } }, [atlasIcon('help')]),
+        h('button', { className: 'icon-btn', onClick: actions.onSettings, attrs: { type: 'button', 'aria-label': 'Settings' } }, [atlasIcon('settings')]),
       ]),
     ]),
     continueButton,
@@ -118,7 +119,7 @@ export function renderMenuView(root: HTMLElement, state: HomeState, actions: Hom
     ]),
     h('button', { className: 'primary-action', text: 'Start new practice', onClick: actions.onPractice, attrs: { type: 'button' } }),
     h('section', { className: 'stats-card journey' }, [
-      h('div', { className: 'section-heading' }, [h('h2', { text: 'Your journey' }), h('span', { className: 'streak-pill' }, [h('span', { text: '🔥 ' }), streak])]),
+      h('div', { className: 'section-heading' }, [h('h2', { text: 'Your journey' }), h('span', { className: 'streak-pill' }, [atlasIcon('streak'), streak])]),
       h('div', { className: 'level-row' }, [
         levelBadge,
         h('div', { className: 'level-copy' }, [levelTitle, levelXp]),
@@ -147,12 +148,12 @@ export function renderMenuView(root: HTMLElement, state: HomeState, actions: Hom
     modeButtons.forEach((button) => button.classList.toggle('selected', button.dataset.mode === next.modeId));
     const labels = { new: 'Start daily quiz', resume: 'Resume daily quiz', done: 'View today’s result' };
     dailyTitle.textContent = labels[next.dailyStatus];
-    dailyCopy.textContent = `${category.name} · ${MODE_INFO[next.modeId].label} · 5 questions`;
+    dailyCopy.textContent = `${category.name} · ${MODE_INFO[next.modeId].label} · ${ROUND_SIZE} questions`;
     const showContinue = next.active?.quiz.status === 'playing';
     continueButton.hidden = !showContinue;
     if (showContinue) {
       const activeCategory = CATEGORIES.find((item) => item.id === next.active!.categoryId)!;
-      continueCopy.textContent = `${activeCategory.name} · ${MODE_INFO[next.active!.modeId].label} · ${next.active!.quiz.index + 1}/5`;
+      continueCopy.textContent = `${activeCategory.name} · ${MODE_INFO[next.active!.modeId].label} · ${next.active!.quiz.index + 1}/${next.active!.quiz.questions.length}`;
     }
     accuracy.textContent = `${next.stats.answered ? Math.round(next.stats.correct / next.stats.answered * 100) : 0}%`;
     played.textContent = String(next.stats.played);
@@ -167,7 +168,7 @@ export function renderMenuView(root: HTMLElement, state: HomeState, actions: Hom
     goalsList.replaceChildren(...journey.missions.map((mission) => {
       const done = mission.progress >= mission.target;
       return h('div', { className: `goal-row${done ? ' done' : ''}` }, [
-        h('span', { className: 'goal-tick', text: done ? '✓' : '○', attrs: { 'aria-hidden': 'true' } }),
+        h('span', { className: 'goal-tick', attrs: { 'aria-hidden': 'true' } }, [atlasIcon(done ? 'check' : 'waypoint')]),
         h('span', { className: 'goal-label', text: mission.label }),
         h('span', {
           className: 'goal-count',

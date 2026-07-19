@@ -6,8 +6,8 @@ export const PRODUCT_ID = 'atlas-sprint';
 /** Display name. */
 export const PRODUCT_NAME = 'Atlas Sprint';
 
-/** Number of questions in daily and practice rounds. */
-export const ROUND_SIZE = 5;
+/** Ten-question routes are long enough to build momentum without becoming a grind. */
+export const ROUND_SIZE = 10;
 
 /** Default timed-question duration. */
 export const TIMER_SECONDS = 15;
@@ -25,10 +25,10 @@ export const TIMINGS = {
 
 /** Player-facing information for every pure rules mode. */
 export const MODE_INFO: Record<ModeId, { label: string; short: string; icon: string }> = {
-  'multiple-choice': { label: 'Pick One', short: '4 choices', icon: 'A' },
-  'true-false': { label: 'True / False', short: 'Trust your gut', icon: '✓' },
-  'type-answer': { label: 'Type It', short: 'No choices', icon: '⌨' },
-  'higher-lower': { label: 'Larger', short: 'Compare area', icon: '↕' },
+  'multiple-choice': { label: 'Pick One', short: '4 choices', icon: 'choice' },
+  'true-false': { label: 'True / False', short: 'Trust your gut', icon: 'boolean' },
+  'type-answer': { label: 'Type It', short: 'No choices', icon: 'type' },
+  'higher-lower': { label: 'Larger', short: 'Compare area', icon: 'compare' },
 };
 
 /** Product source note displayed offline in Settings. */
