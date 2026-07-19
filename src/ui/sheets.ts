@@ -102,14 +102,21 @@ export function showCustomize(
 ): CloseSheet {
   const local = { ...settings };
   let close = (): void => undefined;
+  const selectChoice = (event: Event): void => {
+    const selected = event.currentTarget as HTMLElement;
+    selected.parentElement?.querySelectorAll('button').forEach((button) => {
+      const active = button === selected;
+      button.classList.toggle('selected', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  };
   const topicButtons = CATEGORIES.map((category) => h('button', {
     className: `choice-chip${local.categoryId === category.id ? ' selected' : ''}`,
     onClick: (event) => {
       local.categoryId = category.id;
-      (event.currentTarget as HTMLElement).parentElement?.querySelectorAll('button')
-        .forEach((button) => button.classList.toggle('selected', button === event.currentTarget));
+      selectChoice(event);
     },
-    attrs: { type: 'button' },
+    attrs: { type: 'button', 'aria-pressed': String(local.categoryId === category.id) },
   }, [icon(category.icon), document.createTextNode(category.name)]));
   const modeButtons = (Object.keys(MODE_INFO) as ModeId[]).map((modeId) => {
     const info = MODE_INFO[modeId];
@@ -117,20 +124,18 @@ export function showCustomize(
       className: `format-choice${local.modeId === modeId ? ' selected' : ''}`,
       onClick: (event) => {
         local.modeId = modeId;
-        (event.currentTarget as HTMLElement).parentElement?.querySelectorAll('button')
-          .forEach((button) => button.classList.toggle('selected', button === event.currentTarget));
+        selectChoice(event);
       },
-      attrs: { type: 'button' },
+      attrs: { type: 'button', 'aria-pressed': String(local.modeId === modeId) },
     }, [icon(info.icon), h('span', {}, [h('strong', { text: info.label }), h('small', { text: info.short })])]);
   });
   const paceButtons = ([false, true] as const).map((timed) => h('button', {
     className: `pace-choice${local.timer === timed ? ' selected' : ''}`,
     onClick: (event) => {
       local.timer = timed;
-      (event.currentTarget as HTMLElement).parentElement?.querySelectorAll('button')
-        .forEach((button) => button.classList.toggle('selected', button === event.currentTarget));
+      selectChoice(event);
     },
-    attrs: { type: 'button' },
+    attrs: { type: 'button', 'aria-pressed': String(local.timer === timed) },
   }, [icon(timed ? 'streak' : 'route'), h('span', {}, [
     h('strong', { text: timed ? '15 seconds' : 'Relaxed' }),
     h('small', { text: timed ? 'Speed bonus' : 'No timer' }),

@@ -116,7 +116,6 @@ export function renderQuizView(root: HTMLElement, ctx: QuizViewCtx): QuizViewHan
           className: `fi fi-${ctx.presented.visual.code}`,
           attrs: { role: 'img', 'aria-label': ctx.presented.visual.alt },
         }),
-        h('figcaption', { className: 'sr-only', text: ctx.presented.visual.alt }),
       ])] : []),
       h('h1', { className: 'prompt', text: ctx.presented.prompt }),
     ]),
