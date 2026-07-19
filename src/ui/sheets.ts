@@ -1,6 +1,7 @@
 import { SOURCE_NOTE } from '../product/config.js';
 import type { Settings } from '../product/types.js';
 import { h } from './dom.js';
+import { icon } from './icons.js';
 
 /** Close function returned by every modal sheet. */
 export type CloseSheet = () => void;
@@ -17,7 +18,7 @@ export function showSheet(title: string, content: Node[], onDismiss: () => void)
     h('div', { className: 'sheet-handle' }),
     h('div', { className: 'sheet-header' }, [
       h('h2', { text: title }),
-      h('button', { className: 'icon-btn', text: '×', onClick: close, attrs: { type: 'button', 'aria-label': 'Close' } }),
+      h('button', { className: 'icon-btn', onClick: close, attrs: { type: 'button', 'aria-label': 'Close' } }, [icon('close')]),
     ]),
     ...content,
   ]);
@@ -67,7 +68,7 @@ export function showSettings(
     update();
     rows.push(settingRow(label, copy, button));
   };
-  const THEME_LABELS = { light: '☀ Light', dark: '◐ Dark', system: 'Auto' } as const;
+  const THEME_LABELS = { light: 'Light', dark: 'Dark', system: 'Auto' } as const;
   const theme = h('div', { className: 'segmented' }, (['light', 'dark', 'system'] as const).map((value) => h('button', {
     className: local.theme === value ? 'selected' : '',
     text: THEME_LABELS[value],

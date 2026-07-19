@@ -7,6 +7,7 @@ import { getStats } from '../product/stats.js';
 import type { DailyMeta, StatsBook } from '../product/types.js';
 import { h } from './dom.js';
 import { showSheet, type CloseSheet } from './sheets.js';
+import { icon } from './icons.js';
 
 const MODE_IDS = Object.keys(MODE_INFO) as ModeId[];
 
@@ -27,7 +28,7 @@ export function showStats(book: StatsBook, dailyMeta: DailyMeta): CloseSheet {
     });
     return h('section', { className: 'stats-section' }, [
       h('div', { className: 'stats-section-head' }, [
-        h('h3', { text: `${category.icon} ${category.name}` }),
+        h('h3', {}, [icon('map'), document.createTextNode(category.name)]),
         h('span', { className: 'mastery-chip', text: masteryTier(correctInCategory) }),
       ]),
       h('div', { className: 'stats-row stats-head' }, [
@@ -49,7 +50,7 @@ export function showAchievements(progress: ProgressState): CloseSheet {
   const rows = ACHIEVEMENTS.map((def) => {
     const date = progress.achievements[def.id];
     return h('div', { className: `award-row${date ? ' earned' : ''}` }, [
-      h('span', { className: 'award-icon', text: def.icon, attrs: { 'aria-hidden': 'true' } }),
+      h('span', { className: 'award-icon' }, [icon(def.icon)]),
       h('div', { className: 'award-copy' }, [
         h('strong', { text: def.name }),
         h('p', { text: date ? `${def.description} · Earned ${date}` : def.description }),

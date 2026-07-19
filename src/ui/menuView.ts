@@ -3,6 +3,7 @@ import { CATEGORIES } from '../product/countries.js';
 import { MODE_INFO, PRODUCT_NAME } from '../product/config.js';
 import type { CategoryId, DailyMeta, GameSession, ModeStats } from '../product/types.js';
 import { clearChildren, h } from './dom.js';
+import { icon } from './icons.js';
 
 /** Progression summary the home hub displays. */
 export interface JourneyState {
@@ -98,12 +99,12 @@ export function renderMenuView(root: HTMLElement, state: HomeState, actions: Hom
   });
   const screen = h('main', { className: 'screen home screen-enter' }, [
     h('header', { className: 'home-header' }, [
-      h('div', { className: 'brand' }, [h('span', { className: 'brand-mark', text: 'A' }), h('div', {}, [
+      h('div', { className: 'brand' }, [h('span', { className: 'brand-mark' }, [icon('compass')]), h('div', {}, [
         h('h1', { text: PRODUCT_NAME }), h('p', { text: 'Know the world. Beat the clock.' }),
       ])]),
       h('div', { className: 'header-actions' }, [
-        h('button', { className: 'icon-btn', text: '?', onClick: actions.onHelp, attrs: { type: 'button', 'aria-label': 'How to play' } }),
-        h('button', { className: 'icon-btn', text: '⚙', onClick: actions.onSettings, attrs: { type: 'button', 'aria-label': 'Settings' } }),
+        h('button', { className: 'icon-btn', onClick: actions.onHelp, attrs: { type: 'button', 'aria-label': 'How to play' } }, [icon('help')]),
+        h('button', { className: 'icon-btn', onClick: actions.onSettings, attrs: { type: 'button', 'aria-label': 'Settings' } }, [icon('settings')]),
       ]),
     ]),
     continueButton,
@@ -118,7 +119,7 @@ export function renderMenuView(root: HTMLElement, state: HomeState, actions: Hom
     ]),
     h('button', { className: 'primary-action', text: 'Start new practice', onClick: actions.onPractice, attrs: { type: 'button' } }),
     h('section', { className: 'stats-card journey' }, [
-      h('div', { className: 'section-heading' }, [h('h2', { text: 'Your journey' }), h('span', { className: 'streak-pill' }, [h('span', { text: '🔥 ' }), streak])]),
+      h('div', { className: 'section-heading' }, [h('h2', { text: 'Your journey' }), h('span', { className: 'streak-pill' }, [icon('streak'), streak])]),
       h('div', { className: 'level-row' }, [
         levelBadge,
         h('div', { className: 'level-copy' }, [levelTitle, levelXp]),

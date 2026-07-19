@@ -4,6 +4,7 @@ import type { RoundReward } from '../product/recordResult.js';
 import type { DailyMeta, GameSession, ModeStats } from '../product/types.js';
 import { clearChildren, h } from './dom.js';
 import type { ShareOutcome } from './share.js';
+import { icon } from './icons.js';
 
 /** Completed-round presentation and actions. */
 export interface ResultsCtx {
@@ -42,7 +43,7 @@ export function renderResultsView(root: HTMLElement, ctx: ResultsCtx): void {
     ? 'Perfect route!'
     : correct >= 3 ? 'Strong finish!' : 'New facts unlocked';
   const screen = h('main', { className: 'screen results screen-enter' }, [
-    h('div', { className: 'result-mark', text: correct === state.answers.length ? '★' : '✓' }),
+    h('div', { className: 'result-mark' }, [icon(correct === state.answers.length ? 'spark' : 'check')]),
     h('span', { className: 'eyebrow', text: `${ctx.category} · ${MODE_INFO[ctx.session.modeId].label}` }),
     h('h1', { text: headline }),
     h('p', { className: 'result-copy', text: `${correct} of ${state.answers.length} correct` }),
@@ -53,7 +54,7 @@ export function renderResultsView(root: HTMLElement, ctx: ResultsCtx): void {
     h('div', { className: 'result-stats' }, [
       resultStat('Best', ctx.stats.bestScore.toLocaleString()),
       resultStat('Accuracy', `${ctx.stats.answered ? Math.round(ctx.stats.correct / ctx.stats.answered * 100) : 0}%`),
-      resultStat('Daily', `${ctx.dailyMeta.current} 🔥`),
+      resultStat('Streak', String(ctx.dailyMeta.current)),
     ]),
     ...(ctx.session.kind === 'daily' ? [h('p', { className: 'daily-lock', text: 'Today’s route is complete. A new one arrives at midnight.' })] : []),
     share,
@@ -77,19 +78,19 @@ function rewardRows(reward: RoundReward): HTMLElement {
   ];
   if (reward.level.level > reward.levelBefore) {
     rows.push(h('div', { className: 'reward-row level-up' }, [
-      h('b', { text: '⬆ Level up!' }),
+      h('b', {}, [icon('level'), document.createTextNode('Level up!')]),
       h('span', { text: `You’re now a Level ${reward.level.level} ${reward.title}` }),
     ]));
   }
   for (const mission of reward.missionsCompleted) {
     rows.push(h('div', { className: 'reward-row mission' }, [
-      h('b', { text: '🎯 Goal done' }),
+      h('b', {}, [icon('target'), document.createTextNode('Goal done')]),
       h('span', { text: `${mission.label} · +${MISSION_XP} XP` }),
     ]));
   }
   for (const achievement of reward.achievementsUnlocked) {
     rows.push(h('div', { className: 'reward-row achievement' }, [
-      h('b', { text: `${achievement.icon} Unlocked` }),
+      h('b', {}, [icon(achievement.icon), document.createTextNode('Unlocked')]),
       h('span', { text: achievement.name }),
     ]));
   }

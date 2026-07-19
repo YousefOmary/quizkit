@@ -15,7 +15,10 @@
   },
   "dependencies": {
     "@capacitor/core": "^7.0.0",
-    "@capacitor/preferences": "^7.0.0"
+    "@capacitor/preferences": "^7.0.0",
+    "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "flag-icons": "^7.5.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.0.0",

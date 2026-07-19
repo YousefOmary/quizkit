@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f7f2e8"/>
+  <g opacity=".12" fill="none" stroke="#1f6e8c" stroke-width="2">
+    <path d="M0 120c180-90 350 90 560 0s390-30 640 40M0 240c210-75 330 100 540 5s430-50 660 45M0 390c190-100 370 80 590-20s380-10 610 50M0 520c230-80 380 70 570-10s400-25 630 30"/>
+  </g>
+  <rect x="80" y="70" width="1040" height="490" rx="54" fill="#fffcf6" stroke="#d9d0c0" stroke-width="4"/>
+  <g transform="translate(130 137)">
+    <rect width="150" height="150" rx="40" fill="#16212b"/>
+    <path d="M75 22 126 136l-51-24-51 24Z" fill="#c44a2d"/>
+    <path d="m75 49 22 52-22-10-22 10Z" fill="#f7f2e8"/>
+    <circle cx="75" cy="92" r="9" fill="#1f6e8c"/>
+  </g>
+  <text x="330" y="214" fill="#16212b" font-family="Arial, sans-serif" font-size="94" font-weight="800" letter-spacing="-4">Atlas Sprint</text>
+  <text x="333" y="277" fill="#49606f" font-family="Arial, sans-serif" font-size="35">Five questions. One quick trip around the world.</text>
+  <path d="M150 427c100-92 237 65 344-18s220-12 305 16 147-35 247-96" fill="none" stroke="#c44a2d" stroke-width="12" stroke-linecap="round" stroke-dasharray="1 26"/>
+  <g fill="#fffcf6" stroke="#16212b" stroke-width="8">
+    <circle cx="150" cy="427" r="18"/><circle cx="373" cy="421" r="18"/><circle cx="586" cy="400" r="18"/><circle cx="800" cy="425" r="18"/><circle cx="1046" cy="329" r="18"/>
+  </g>
+  <circle cx="1046" cy="329" r="7" fill="#1f6e8c"/>
+</svg>

@@ -1,5 +1,8 @@
-const CACHE = 'atlas-sprint-v3';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
+const CACHE = 'atlas-sprint-v4';
+const CORE = [
+  './', './index.html', './manifest.webmanifest', './favicon.svg', './icon.svg',
+  './icon-192.png', './icon-512.png', './apple-touch-icon.png', './og.png',
+];
 
 /** Cache every hashed asset referenced by an index.html document. */
 async function cacheAssetsFrom(html, cache) {
