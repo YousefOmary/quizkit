@@ -34,7 +34,8 @@
 
 .stats-section { margin-top: 14px; padding: 12px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
 .stats-section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.stats-section-head h3 { margin: 0; font-size: .86rem; }
+.stats-section-head h3 { display: inline-flex; align-items: center; gap: 7px; margin: 0; font-size: .86rem; }
+.stats-section-head h3 .atlas-icon { width: 17px; height: 17px; color: var(--category); }
 .mastery-chip { padding: 4px 9px; border-radius: 99px; background: var(--surface-2); color: var(--text); font-size: .62rem; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
 .stats-row { display: grid; grid-template-columns: 1fr 52px 48px 56px; gap: 6px; padding: 6px 0; font-size: .72rem; font-variant-numeric: tabular-nums; }
 .stats-row > span { text-align: right; }
@@ -48,7 +49,9 @@
   background: var(--surface); opacity: .55;
 }
 .award-row.earned { opacity: 1; border-color: var(--correct); }
-.award-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--surface-2); font-size: 1.1rem; }
+.award-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--surface-2); color: var(--category); font-size: 1.1rem; }
+.award-icon .atlas-icon { width: 22px; height: 22px; }
 .award-copy strong { font-size: .78rem; }
 .award-copy p { margin: 2px 0 0; color: var(--muted); font-size: .66rem; line-height: 1.35; }
-.award-state { color: var(--correct); font-weight: 900; text-align: center; }
+.award-state { display: grid; place-items: center; color: var(--correct); font-weight: 900; text-align: center; }
+.award-state .atlas-icon { width: 16px; height: 16px; }

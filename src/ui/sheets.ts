@@ -1,6 +1,7 @@
-import { SOURCE_NOTE } from '../product/config.js';
+import { ROUND_SIZE, SOURCE_NOTE } from '../product/config.js';
 import type { Settings } from '../product/types.js';
 import { h } from './dom.js';
+import { atlasIcon } from './icons.js';
 
 /** Close function returned by every modal sheet. */
 export type CloseSheet = () => void;
@@ -17,7 +18,7 @@ export function showSheet(title: string, content: Node[], onDismiss: () => void)
     h('div', { className: 'sheet-handle' }),
     h('div', { className: 'sheet-header' }, [
       h('h2', { text: title }),
-      h('button', { className: 'icon-btn', text: '×', onClick: close, attrs: { type: 'button', 'aria-label': 'Close' } }),
+      h('button', { className: 'icon-btn', onClick: close, attrs: { type: 'button', 'aria-label': 'Close' } }, [atlasIcon('close')]),
     ]),
     ...content,
   ]);
@@ -39,7 +40,7 @@ export function showHowTo(onDismiss: () => void): CloseSheet {
     ['4', 'Build a combo', 'Fast correct answers score more; streaks raise the multiplier.'],
   ];
   return showSheet('How to play', [
-    h('p', { className: 'sheet-intro', text: 'Five questions. One quick trip around the world.' }),
+    h('p', { className: 'sheet-intro', text: `${ROUND_SIZE} unique questions. One satisfying trip around the world.` }),
     h('div', { className: 'how-list' }, steps.map(([number, title, copy]) => h('div', { className: 'how-step' }, [
       h('b', { text: number }), h('div', {}, [h('strong', { text: title }), h('p', { text: copy })]),
     ]))),
@@ -67,7 +68,7 @@ export function showSettings(
     update();
     rows.push(settingRow(label, copy, button));
   };
-  const THEME_LABELS = { light: '☀ Light', dark: '◐ Dark', system: 'Auto' } as const;
+  const THEME_LABELS = { light: 'Light', dark: 'Dark', system: 'Auto' } as const;
   const theme = h('div', { className: 'segmented' }, (['light', 'dark', 'system'] as const).map((value) => h('button', {
     className: local.theme === value ? 'selected' : '',
     text: THEME_LABELS[value],

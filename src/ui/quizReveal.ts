@@ -1,6 +1,7 @@
 import type { AnswerInput, Judgement } from '../engine/types.js';
 import type { KeyboardHandle } from './keyboard.js';
 import { h } from './dom.js';
+import { atlasIcon } from './icons.js';
 
 /** Feedback applied in-place after the engine judges an answer. */
 export interface RevealData {
@@ -29,11 +30,11 @@ export function applyReveal(
   });
   keyboard?.disable();
   const good = data.judgement.correct;
-  const label = data.skipped ? '↷ Skipped' : good ? '✓ Correct' : '× Not quite';
+  const label = data.skipped ? 'Skipped' : good ? 'Correct' : 'Not quite';
   feedback.className = `feedback ${good ? 'good' : 'bad'}`;
   feedback.removeAttribute('hidden');
   feedback.replaceChildren(
-    h('strong', { className: 'feedback-label', text: label }),
+    h('strong', { className: 'feedback-label' }, [atlasIcon(data.skipped ? 'waypoint' : good ? 'check' : 'close'), document.createTextNode(label)]),
     h('p', { text: `Answer: ${data.judgement.correctAnswer}` }),
     ...(data.judgement.explanation
       ? [h('p', { className: 'explanation', text: data.judgement.explanation })]
@@ -44,7 +45,7 @@ export function applyReveal(
     }),
   );
   score.textContent = String(totalScore);
-  screen.classList.add(good ? 'flash-good' : 'flash-bad');
+  screen.classList.add(good ? 'flash-good' : 'flash-bad', 'route-revealed');
   if (good && data.multiplier > 1) {
     combo.textContent = `×${data.multiplier.toFixed(1)} COMBO`;
     combo.removeAttribute('hidden');

@@ -3,6 +3,7 @@ import type { Lifelines } from '../product/types.js';
 import { clearChildren, h } from './dom.js';
 import { createKeyboard, type KeyboardHandle } from './keyboard.js';
 import { applyReveal, type RevealData } from './quizReveal.js';
+import { atlasIcon } from './icons.js';
 
 /** Data needed to build one question screen. */
 export interface QuizViewCtx {
@@ -75,12 +76,12 @@ export function renderQuizView(root: HTMLElement, ctx: QuizViewCtx): QuizViewHan
   if (!ctx.timerTotal) lifelines[2]!.disabled = true;
   const screen = h('main', { className: 'screen quiz screen-enter' }, [
     h('header', { className: 'play-header' }, [
-      h('button', { className: 'icon-btn', text: '‹', onClick: ctx.onPause, attrs: { type: 'button', 'aria-label': 'Pause quiz' } }),
+      h('button', { className: 'icon-btn', onClick: ctx.onPause, attrs: { type: 'button', 'aria-label': 'Pause quiz' } }, [atlasIcon('back')]),
       h('div', { className: 'play-heading' }, [
         h('strong', { text: ctx.category }),
         h('span', { text: ctx.mode }),
       ]),
-      h('button', { className: 'icon-btn', text: '?', onClick: ctx.onHelp, attrs: { type: 'button', 'aria-label': 'How to play' } }),
+      h('button', { className: 'icon-btn', onClick: ctx.onHelp, attrs: { type: 'button', 'aria-label': 'How to play' } }, [atlasIcon('help')]),
     ]),
     h('div', { className: 'progress-row' }, [
       h('span', { text: `Question ${ctx.index + 1} of ${ctx.total}` }),
@@ -93,6 +94,7 @@ export function renderQuizView(root: HTMLElement, ctx: QuizViewCtx): QuizViewHan
       h('div', { className: 'timer-track' }, [timerBar]), timerText,
     ])] : []),
     h('section', { className: 'question-card' }, [
+      h('span', { className: 'route-mark', attrs: { 'aria-hidden': 'true' } }, [atlasIcon('waypoint')]),
       h('span', { className: 'eyebrow', text: ctx.mode }),
       h('h1', { className: 'prompt', text: ctx.presented.prompt }),
     ]),

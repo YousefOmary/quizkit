@@ -21,7 +21,7 @@ function multipleChoice(category: Category): McPack {
   return {
     packId: `${category.id}-capitals-mc-v1`,
     questions: facts.map((fact, index) => ({
-      prompt: `${fact.flag} What is the capital of ${questionName(fact)}?`,
+      prompt: `${fact.flag} · What is the capital of ${questionName(fact)}?`,
       correct: fact.capital,
       wrong: [1, 2, 3].map((step) => facts[(index + step) % facts.length]!.capital) as [string, string, string],
       explanation: explanation(fact),
@@ -34,12 +34,16 @@ function trueFalse(category: Category): TfPack {
   return {
     packId: `${category.id}-capitals-tf-v1`,
     labels: ['True', 'False'],
-    questions: facts.flatMap((fact, index) => {
-      const wrong = facts[(index + 1) % facts.length]!.capital;
-      return [
-        { statement: `${fact.capital} is the capital of ${questionName(fact)}.`, isTrue: true, explanation: explanation(fact) },
-        { statement: `${wrong} is the capital of ${questionName(fact)}.`, isTrue: false, explanation: explanation(fact) },
-      ];
+    // Exactly one statement per country prevents a round from asking the same
+    // underlying fact twice in true and false forms.
+    questions: facts.map((fact, index) => {
+      const isTrue = index % 2 === 0;
+      const shown = isTrue ? fact.capital : facts[(index + 7) % facts.length]!.capital;
+      return {
+        statement: `${fact.flag} · ${shown} is the capital of ${questionName(fact)}.`,
+        isTrue,
+        explanation: explanation(fact),
+      };
     }),
   };
 }
@@ -48,7 +52,7 @@ function typeAnswer(category: Category): TaPack {
   return {
     packId: `${category.id}-capitals-type-v1`,
     questions: category.facts.map((fact) => ({
-      prompt: `${fact.flag} Type the capital of ${questionName(fact)}.`,
+      prompt: `${fact.flag} · Type the capital of ${questionName(fact)}.`,
       acceptedAnswers: [fact.capital, ...(fact.accepted ?? [])],
       explanation: explanation(fact),
     })),
@@ -62,8 +66,8 @@ function pairs(facts: CountryFact[]): HlPackQuestion[] {
       const first = facts[a]!;
       const second = facts[b]!;
       result.push({
-        a: { label: `${first.flag} ${first.name}`, value: first.area },
-        b: { label: `${second.flag} ${second.name}`, value: second.area },
+        a: { label: `${first.flag} · ${first.name}`, value: first.area },
+        b: { label: `${second.flag} · ${second.name}`, value: second.area },
       });
     }
   }

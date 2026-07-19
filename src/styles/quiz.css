@@ -13,7 +13,10 @@
 .timer-bar.urgent { background: var(--wrong); }
 .timer-text { color: var(--muted); font-size: .68rem; font-variant-numeric: tabular-nums; }
 
-.question-card { min-height: 112px; padding: 17px; border: 1px solid var(--border); border-radius: 23px 23px 23px 7px; background: var(--surface); box-shadow: var(--shadow); }
+.question-card { position: relative; min-height: 112px; padding: 17px; border: 1px solid var(--border); border-radius: 23px 23px 23px 7px; background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
+.route-mark { position: absolute; right: 14px; top: 13px; color: var(--category); opacity: .22; transform: translateX(-8px); }
+.route-mark .atlas-icon { width: 32px; height: 32px; }
+.route-revealed .route-mark { animation: route-arrive .55s cubic-bezier(.2,.9,.2,1) both; }
 .prompt { margin: 8px 0 0; font-size: clamp(1.16rem, 5vw, 1.48rem); line-height: 1.26; letter-spacing: -.025em; }
 .options { display: grid; gap: 8px; }
 .option {
@@ -36,7 +39,8 @@
 .lifeline.used, .lifeline:disabled { opacity: .42; text-decoration: line-through; }
 .feedback { padding: 13px 14px; border-radius: 17px; border: 1px solid var(--border); background: var(--surface); }
 .feedback.good { border-color: var(--correct); }.feedback.bad { border-color: var(--wrong); }
-.feedback-label { color: var(--correct); }.feedback.bad .feedback-label { color: var(--wrong); }
+.feedback-label { display: inline-flex; align-items: center; gap: 6px; color: var(--correct); }.feedback.bad .feedback-label { color: var(--wrong); }
+.feedback-label .atlas-icon { width: 15px; height: 15px; }
 .feedback p { margin: 4px 0 0; font-size: .76rem; }.feedback .explanation { color: var(--muted); }
 .points { display: block; margin-top: 7px; font-size: .68rem; font-weight: 800; }
 .combo-pop { position: fixed; z-index: 5; left: 50%; top: 44%; transform: translate(-50%, -50%) rotate(-4deg); padding: 10px 16px; border-radius: 12px; background: var(--category); color: #121212; font-size: 1.25rem; font-weight: 950; box-shadow: var(--shadow); pointer-events: none; }
@@ -51,3 +55,5 @@
 @media (max-height: 720px) {
   .quiz { gap: 7px; }.question-card { min-height: 92px; padding: 13px; }.option { min-height: 47px; }.key { height: 36px; }
 }
+
+@keyframes route-arrive { from { opacity: .2; transform: translateX(-18px); } to { opacity: .9; transform: translateX(0); } }
