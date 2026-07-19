@@ -40,7 +40,7 @@ export async function recordResult(
   now: Date = new Date(),
 ): Promise<RoundOutcome> {
   const key = statsKey(session.categoryId, session.modeId);
-  stats[key] = applyRound(getStats(stats, session.categoryId, session.modeId), session.quiz);
+  stats[key] = applyRound(getStats(stats, session.categoryId, session.modeId), session.quiz, !session.assisted);
   const nextDaily = session.kind === 'daily' ? applyDaily(dailyMeta, session.dateKey) : dailyMeta;
 
   const round = summarizeSession(session);

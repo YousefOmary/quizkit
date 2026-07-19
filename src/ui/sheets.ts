@@ -60,7 +60,7 @@ export function showSettings(
 ): CloseSheet {
   const local = { ...settings };
   const rows: HTMLElement[] = [];
-  const addToggle = (label: string, copy: string, key: 'sound' | 'music' | 'haptics' | 'timer'): void => {
+  const addToggle = (label: string, copy: string, key: 'sound' | 'music' | 'haptics' | 'timer' | 'motion'): void => {
     const button = h('button', { className: 'toggle', attrs: { type: 'button', role: 'switch' } });
     const update = (): void => {
       button.textContent = local[key] ? 'On' : 'Off';
@@ -86,6 +86,7 @@ export function showSettings(
   addToggle('Sound effects', 'Procedural taps, reveals, and fanfare.', 'sound');
   addToggle('Ambient music', 'A very quiet focus tone.', 'music');
   addToggle('Vibration', 'Tiny pulses on answers, where supported.', 'haptics');
+  addToggle('Travel motion', 'Route drawing and reward movement.', 'motion');
   addToggle('Practice timer', '15s + speed bonus. The Daily is always timed so scores stay fair.', 'timer');
   return showSheet('Settings', [
     h('div', { className: 'settings-list' }, rows),

@@ -6,7 +6,7 @@ import type { StorageAdapter } from '../src/platform/StorageAdapter.js';
 import { ProductStore } from '../src/platform/productStore.js';
 import { CATEGORIES } from '../src/product/countries.js';
 import { defaultSettings } from '../src/product/defaults.js';
-import { createSession, sessionKey } from '../src/product/session.js';
+import { createPracticeRetry, createSession, sessionKey } from '../src/product/session.js';
 
 class MemoryStorage implements StorageAdapter {
   readonly data = new Map<string, string>();
@@ -39,6 +39,23 @@ test('daily session key: canonical across every selected practice setup', () => 
 test('new practice defaults to a relaxed pace', () => {
   const session = createSession(CATEGORIES[0]!, 'multiple-choice', 'free', defaultSettings());
   assert.equal(session.quiz.timerSeconds, 0);
+});
+
+test('rewarded retry: one missed practice question only, marked assisted', () => {
+  const source = createSession(CATEGORIES[0]!, 'multiple-choice', 'free', defaultSettings());
+  const questions = source.quiz.questions;
+  source.quiz.status = 'finished';
+  source.quiz.index = questions.length;
+  source.quiz.answers = questions.map((_, index) => ({
+    input: 0, correct: index !== 2, correctAnswer: `Answer ${index}`, points: index === 2 ? 0 : 100,
+  }));
+  const retry = createPracticeRetry(source);
+  assert.equal(retry?.assisted, true);
+  assert.equal(retry?.quiz.questions.length, 1);
+  assert.deepEqual(retry?.quiz.questions[0], questions[2]);
+  assert.equal(retry?.quiz.answers.length, 0);
+  assert.equal(createPracticeRetry({ ...source, kind: 'daily' }), null, 'Daily can never retry');
+  assert.equal(createPracticeRetry({ ...source, rewardedRetryUsed: true }), null, 'claim is one-use');
 });
 
 test('save/restore: in-progress quiz retains answer, timer, and lifelines exactly', async () => {

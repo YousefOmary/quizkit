@@ -14,7 +14,7 @@ export function getStats(book: StatsBook, categoryId: string, modeId: string): M
 }
 
 /** Fold a completed round into accuracy, best score, and answer streaks. */
-export function applyRound(stats: ModeStats, state: QuizState): ModeStats {
+export function applyRound(stats: ModeStats, state: QuizState, competitive = true): ModeStats {
   let currentStreak = stats.currentStreak;
   let bestStreak = stats.bestStreak;
   for (const answer of state.answers) {
@@ -26,7 +26,7 @@ export function applyRound(stats: ModeStats, state: QuizState): ModeStats {
     played: stats.played + 1,
     correct: stats.correct + state.answers.filter((answer) => answer.correct).length,
     answered: stats.answered + state.answers.length,
-    bestScore: Math.max(stats.bestScore, state.score),
+    bestScore: competitive ? Math.max(stats.bestScore, state.score) : stats.bestScore,
     currentStreak,
     bestStreak,
   };

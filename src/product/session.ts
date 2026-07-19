@@ -63,6 +63,42 @@ export function createSession(
   };
 }
 
+/**
+ * Build the one-question assisted retry unlocked after an optional rewarded
+ * practice boundary. Daily sessions and perfect rounds can never enter.
+ */
+export function createPracticeRetry(source: GameSession): GameSession | null {
+  if (source.kind !== 'free' || source.quiz.status !== 'finished' || source.rewardedRetryUsed) return null;
+  const missed = source.quiz.answers.findIndex((answer) => !answer.correct && !answer.skipped);
+  if (missed < 0) return null;
+  const question = source.quiz.questions[missed];
+  if (question === undefined) return null;
+  return {
+    version: 1,
+    key: `practice-retry:${source.categoryId}:${source.modeId}:${source.dateKey}`,
+    dateKey: source.dateKey,
+    categoryId: source.categoryId,
+    modeId: source.modeId,
+    kind: 'free',
+    assisted: true,
+    rewardedRetryUsed: true,
+    lifelines: { fifty: true, skip: true, time: true },
+    eliminated: [],
+    timerLeft: source.quiz.timerSeconds,
+    quiz: {
+      ...source.quiz,
+      kind: 'free',
+      dayNumber: 0,
+      questions: [question],
+      index: 0,
+      answers: [],
+      score: 0,
+      streakInQuiz: 0,
+      status: 'playing',
+    },
+  };
+}
+
 /** Day ordinal for a YYYY-MM-DD key, aligned with engine daily numbering. */
 export function dayNumberForKey(key: string): number {
   const [year, month, day] = key.split('-').map(Number);

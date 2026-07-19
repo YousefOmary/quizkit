@@ -29,6 +29,8 @@ export interface Settings {
   sound: boolean;
   music: boolean;
   haptics: boolean;
+  /** In-app motion preference, in addition to the OS reduced-motion setting. */
+  motion: boolean;
   /** Practice-round timer. The Daily is always timed for fair scores. */
   timer: boolean;
   onboardingSeen: boolean;
@@ -56,6 +58,10 @@ export interface GameSession {
   /** Choice indices removed by 50:50 on the current question. */
   eliminated: number[];
   timerLeft: number;
+  /** Assisted rounds teach and grant XP but cannot set competitive bests. */
+  assisted?: boolean;
+  /** The optional one-question rewarded retry has already been claimed. */
+  rewardedRetryUsed?: boolean;
   /** Prevents a restored finished round from being folded into stats twice. */
   recorded?: boolean;
 }

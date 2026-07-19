@@ -1,26 +1,26 @@
-import type { QuizState } from './types.js';
+import type { AnswerRecord, QuizState } from './types.js';
+
+/** A spoiler-free Wordle-style token: never contains a prompt or answer. */
+export function shareToken(answer: AnswerRecord): string {
+  if (answer.skipped) return '🟨';
+  return answer.correct ? '🟩' : '⬛';
+}
 
 /**
- * Spoiler-free share text: a Wordle-style emoji grid plus a headline.
- * Reveals correctness pattern and score — never the questions or answers.
+ * Build the compact result-card copy used by the viral Daily loop.
+ * It includes only the event number, correctness pattern, and personal
+ * streaks. Questions, inputs, correct answers, scores, and pack data are
+ * deliberately unavailable to this formatter.
  */
-
-/**
- * Build the share string for a finished round.
- * Input: the theme's shareTemplate (placeholders: {name} {day} {correct}
- * {total} {score}), the game's display name, and the finished state.
- * Output: headline line + emoji grid line (🟩 correct / 🟥 wrong).
- * For free play, {day} renders as 'free'.
- */
-export function shareText(template: string, name: string, state: QuizState): string {
-  const correct = state.answers.filter((a) => a.correct).length;
-  const dayLabel = state.kind === 'daily' ? String(state.dayNumber) : 'free';
-  const headline = template
-    .replace('{name}', name)
-    .replace('{day}', dayLabel)
-    .replace('{correct}', String(correct))
-    .replace('{total}', String(state.answers.length))
-    .replace('{score}', String(state.score));
-  const grid = state.answers.map((a) => (a.correct ? '🟩' : '🟥')).join('');
-  return `${headline}\n${grid}`;
+export function shareText(
+  name: string,
+  state: QuizState,
+  currentStreak = 0,
+  bestStreak = currentStreak,
+): string {
+  const correct = state.answers.filter((answer) => answer.correct).length;
+  const label = state.kind === 'daily' ? `${name} #${state.dayNumber}` : `${name} Practice`;
+  const grid = state.answers.map(shareToken).join('');
+  const streaks = `Route streak ${currentStreak} · Best ${bestStreak}`;
+  return `${label} · ${correct}/${state.answers.length} ${grid}\n${streaks}`;
 }

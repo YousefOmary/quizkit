@@ -2,6 +2,8 @@ import { audio } from '../audio/audioCore.js';
 import { localDateKey } from '../engine/daily.js';
 import { shareText } from '../engine/share.js';
 import { analytics } from '../platform/analytics.js';
+import { monetization } from '../platform/monetization.js';
+import { canOfferRewarded } from '../product/adPolicy.js';
 import type { ProductStore } from '../platform/productStore.js';
 import { ACHIEVEMENTS } from '../product/achievements.js';
 import { getCategory } from '../product/countries.js';
@@ -9,7 +11,7 @@ import { PRODUCT_NAME } from '../product/config.js';
 import { missionsForDate } from '../product/missions.js';
 import { levelFromXp, titleForLevel, type ProgressState } from '../product/progress.js';
 import {
-  CANONICAL_DAILY_CATEGORY_ID, CANONICAL_DAILY_MODE_ID, createSession, sessionKey,
+  CANONICAL_DAILY_CATEGORY_ID, CANONICAL_DAILY_MODE_ID, createPracticeRetry, createSession, sessionKey,
 } from '../product/session.js';
 import { recordResult, type RoundReward } from '../product/recordResult.js';
 import { getStats } from '../product/stats.js';
@@ -18,7 +20,7 @@ import { renderMenuView, type HomeState, type JourneyState } from './menuView.js
 import { PlaySession } from './playSession.js';
 import { applyCategory, applyPreferences, watchSystemTheme } from './preferences.js';
 import { renderResultsView } from './resultsView.js';
-import { shareOrCopy } from './share.js';
+import { copyText } from './clipboard.js';
 import { showCustomize, showHowTo, showNewQuizConfirm, showPause, showSettings } from './sheets.js';
 import { showJourney } from './sheetsProgress.js';
 
@@ -161,9 +163,10 @@ export class App {
       stats: getStats(this.stats, session.categoryId, session.modeId),
       dailyMeta: this.dailyMeta,
       reward,
-      onShare: () => this.share(session),
+      onCopy: () => this.copyResult(session),
       onAgain: () => this.newPractice(session.categoryId, session.modeId),
       onMenu: () => void this.showHome(),
+      ...(this.canRetry(session) ? { onRetry: () => this.rewardedRetry(session) } : {}),
     });
   }
   private trackCompletion(session: GameSession, reward: RoundReward): void {
@@ -183,13 +186,29 @@ export class App {
       audio.milestone();
     }
   }
-  private async share(session: GameSession) {
-    const template = session.kind === 'daily'
-      ? '{name} · Day {day} · {correct}/{total} · {score} pts'
-      : '{name} · Practice · {correct}/{total} · {score} pts';
-    const outcome = await shareOrCopy(shareText(template, PRODUCT_NAME, session.quiz));
-    analytics.track({ name: 'result_shared', kind: session.kind, outcome });
-    return outcome;
+  private async copyResult(session: GameSession): Promise<boolean> {
+    const copied = await copyText(shareText(
+      PRODUCT_NAME, session.quiz, this.dailyMeta.current, this.dailyMeta.best,
+    ));
+    analytics.track({ name: 'result_shared', kind: session.kind, outcome: copied ? 'copied' : 'failed' });
+    return copied;
+  }
+  private canRetry(session: GameSession): boolean {
+    return canOfferRewarded(session.kind)
+      && !session.rewardedRetryUsed
+      && session.quiz.answers.some((answer) => !answer.correct && !answer.skipped)
+      && monetization.isRewardedReady('practice-rewarded-lifeline');
+  }
+  private async rewardedRetry(source: GameSession): Promise<boolean> {
+    if (!this.canRetry(source)) return false;
+    const result = await monetization.showRewarded('practice-rewarded-lifeline');
+    if (result !== 'completed') return false;
+    const retry = createPracticeRetry(source);
+    if (!retry) return false;
+    source.rewardedRetryUsed = true;
+    await this.store.saveSession(source);
+    this.play(retry);
+    return true;
   }
   private openSettings(): void {
     showSettings(this.settings, (next, key) => {

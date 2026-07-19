@@ -46,6 +46,7 @@ export function applyReveal(
   );
   score.textContent = String(totalScore);
   screen.classList.add(good ? 'flash-good' : 'flash-bad');
+  screen.classList.add('route-landed');
   if (good && data.multiplier > 1) {
     combo.textContent = `×${data.multiplier.toFixed(1)} COMBO`;
     combo.removeAttribute('hidden');
